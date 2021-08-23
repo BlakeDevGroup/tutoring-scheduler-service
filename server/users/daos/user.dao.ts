@@ -47,7 +47,7 @@ class UserDao {
         `;
         const { rows } = await query(sql, [userId]);
 
-        return rows;
+        return rows[0];
     }
 
     async putUserById(userId: string, user: PutUserDto) {

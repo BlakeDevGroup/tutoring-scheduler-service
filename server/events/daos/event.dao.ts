@@ -19,12 +19,14 @@ class EventDao {
             VALUES ($1, $2, $3, $4)
         `;
 
-        return await query(sql, [
+        const { rows } = await query(sql, [
             event.dateStart,
             event.dateEnd,
             event.title,
             event.allDay,
         ]);
+
+        return rows[0];
     }
 
     async getEvents(): Promise<Query> {
@@ -32,32 +34,38 @@ class EventDao {
             SELECT * FROM "${this.tableName}"
         `;
 
-        return await query(sql, []);
+        const { rows } = await query(sql, []);
+
+        return rows;
     }
 
     async getEventById(eventId: string): Promise<Query> {
         const sql = `
             SELECT * FROM "${this.tableName}"
-            WHERE eventId = $1
+            WHERE event_id = $1
         `;
 
-        return await query(sql, [eventId]);
+        const { rows } = await query(sql, [eventId]);
+
+        return rows[0];
     }
 
     async putEventById(eventId: string, event: PutEventDto): Promise<Query> {
         const sql = `
             UPDATE "${this.tableName}"
             SET date_start = $2, date_end = $3, title = $4, all_day = $5
-            WHERE eventId = $1
+            WHERE event_id = $1
         `;
 
-        return await query(sql, [
+        const { rows } = await query(sql, [
             eventId,
             event.dateStart,
             event.dateEnd,
             event.title,
             event.allDay,
         ]);
+
+        return rows[0];
     }
 
     async patchEventById(
@@ -67,16 +75,18 @@ class EventDao {
         const sql = `
             UPDATE "${this.tableName}"
             SET date_start = $2, date_end = $3, all_day = $4, title = $5
-            WHERE eventId = $1
+            WHERE event_id = $1
         `;
 
-        return await query(sql, [
+        const { rows } = await query(sql, [
             eventId,
             event.dateStart,
             event.dateEnd,
             event.allDay,
             event.title,
         ]);
+
+        return rows[0];
     }
 
     async removeEventById(eventId: string) {
