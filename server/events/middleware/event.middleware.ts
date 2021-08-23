@@ -1,8 +1,8 @@
 import express from "express";
-import eventService from "../services/event.service";
+import EventService from "../services/event.service";
 import debug from "debug";
 
-const log: debug.IDebugger = debug("app:events-controller");
+const log: debug.IDebugger = debug("app:event-middleware");
 
 class EventMiddleware {
     async validateDates(
@@ -26,6 +26,31 @@ class EventMiddleware {
 
     private startDateIsLessThanEndDate(startDate: string, endDate: string) {
         return new Date(startDate) < new Date(endDate);
+    }
+
+    async validateEventExists(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        const event = await EventService.readById(req.params.eventId);
+
+        if (event) {
+            next();
+        } else {
+            res.status(404).send({
+                error: `Event ${req.params.eventId} not found`,
+            });
+        }
+    }
+
+    async extractEventId(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        req.body.eventId = req.params.eventId;
+        next();
     }
 }
 

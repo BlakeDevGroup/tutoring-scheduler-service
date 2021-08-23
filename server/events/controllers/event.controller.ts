@@ -2,7 +2,7 @@ import express from "express";
 import EventService from "../services/event.service";
 import debug from "debug";
 
-const log: debug.IDebugger = debug("app:events-controller");
+const log: debug.IDebugger = debug("app:event-controller");
 
 class EventsController {
     async listEvents(req: express.Request, res: express.Response) {

@@ -1,6 +1,7 @@
 import { CommonRoutesConfig } from "../common/common.routes.config";
 import EventsController from "./controllers/event.controller";
 import eventsMiddleware from "./middleware/event.middleware";
+import BodyValidationMiddleware from "../common/middleware/body.validation.middleware";
 import express from "express";
 
 export class EventRoutes extends CommonRoutesConfig {
@@ -13,12 +14,14 @@ export class EventRoutes extends CommonRoutesConfig {
             .route(`/events`)
             .get(EventsController.listEvents)
             .post([
+                BodyValidationMiddleware.verifyBodyFieldsErrors,
                 eventsMiddleware.validateDates,
                 EventsController.createEvent,
             ]);
-
+        this.app.param(`eventId`, eventsMiddleware.extractEventId);
         this.app
             .route(`/events/:eventId`)
+            .all(eventsMiddleware.validateEventExists)
             .get(EventsController.getEventById)
             .delete(EventsController.removeEvent);
 
