@@ -10,7 +10,7 @@ import { CalendarRoutes } from "./server/calendars/calendar.routes.config";
 import { SeriesRoutes } from "./server/series/series.routes.config";
 import { PaymentOverrideRoutes } from "./server/payment_overrides/payment_override.routes.config";
 import { CancellationRoutes } from "./server/cancellations/cancellation.routes.config";
-
+import { CompanyRoutes } from "./server/companies/company.routes.config";
 import debug from "debug";
 
 const app: express.Application = express();
@@ -34,7 +34,7 @@ const loggerOptions: expressWinston.LoggerOptions = {
 };
 
 if (!process.env.DEBUG) {
-    loggerOptions.meta = true;
+    loggerOptions.meta = false;
 }
 
 app.use(expressWinston.logger(loggerOptions));
@@ -45,6 +45,7 @@ routes.push(new CalendarRoutes(app));
 routes.push(new PaymentOverrideRoutes(app));
 routes.push(new SeriesRoutes(app));
 routes.push(new CancellationRoutes(app));
+routes.push(new CompanyRoutes(app));
 
 const runningMessage = `Server running at http://localhost:${port}`;
 app.get("/", (req: express.Request, res: express.Response) => {

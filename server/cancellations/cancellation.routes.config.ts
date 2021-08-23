@@ -24,7 +24,7 @@ export class CancellationRoutes extends CommonRoutesConfig {
         );
 
         this.app
-            .route(`cancellations/:cancellationId`)
+            .route(`/cancellations/:cancellationId`)
             .all(cancellationMiddleware.validateCancellationExists)
             .get(cancellationController.getCancellationById)
             .delete(cancellationController.removeEvent)
