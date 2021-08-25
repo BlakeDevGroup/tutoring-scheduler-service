@@ -5,22 +5,24 @@ import debug from "debug";
 const log: debug.IDebugger = debug("app:event-controller");
 
 class EventsController {
+    private eventService: EventService = new EventService();
     async listEvents(req: express.Request, res: express.Response) {
-        const events = await EventService.listByCalendarId(
+        const events = await this.eventService.listByCalendarId(
             req.body.calendarId,
-            100,
-            0
+            req.body.limit || 100,
+            req.body.page || 1
         );
+
         res.status(200).send(events);
     }
 
     async getEventById(req: express.Request, res: express.Response) {
-        const event = await EventService.readById(req.body.eventId);
+        const event = await this.eventService.readById(req.body.eventId);
         res.status(200).send(event);
     }
 
     async createEvent(req: express.Request, res: express.Response) {
-        const event = await EventService.create(req.body);
+        const event = await this.eventService.create(req.body);
 
         res.status(200).send({
             success: "Event Successfully Created",
@@ -28,19 +30,19 @@ class EventsController {
     }
 
     async patch(req: express.Request, res: express.Response) {
-        log(await EventService.patchById(req.body.eventId, req.body));
+        log(await this.eventService.patchById(req.body.eventId, req.body));
 
         res.status(204).send();
     }
 
     async put(req: express.Request, res: express.Response) {
-        log(await EventService.putById(req.body.eventId, req.body));
+        log(await this.eventService.putById(req.body.eventId, req.body));
 
         res.status(204).send();
     }
 
     async removeEvent(req: express.Request, res: express.Response) {
-        log(await EventService.deleteById(req.body.eventId));
+        log(await this.eventService.deleteById(req.body.eventId));
 
         res.status(204).send();
     }

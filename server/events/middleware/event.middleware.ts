@@ -5,6 +5,7 @@ import debug from "debug";
 const log: debug.IDebugger = debug("app:event-middleware");
 
 class EventMiddleware {
+    private eventService: EventService = new EventService();
     async validateDates(
         req: express.Request,
         res: express.Response,
@@ -32,7 +33,7 @@ class EventMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const event = await EventService.readById(req.params.eventId);
+        const event = await this.eventService.readById(req.params.eventId);
 
         if (event) {
             next();

@@ -7,10 +7,11 @@ import { Query } from "pg";
 
 const log: debug.IDebugger = debug(`app:event-dao`);
 
-class EventDao {
+export default class EventDao {
     private tableName = "ts.events";
     constructor() {
         log("Created new instance of EventDao");
+        console.log("Created new instance of EventDao");
     }
 
     async addEvent(event: CreateEventDto) {
@@ -30,7 +31,7 @@ class EventDao {
         }
     }
 
-    async getEvents(): Promise<Query> {
+    async getEvents() {
         const sql = `SELECT * FROM "${this.tableName}" WHERE calendar_id = $1`;
         try {
             const { rows } = await query(sql, []);
@@ -41,7 +42,7 @@ class EventDao {
         }
     }
 
-    async getEventsByCalendarId(calendarId: string): Promise<Query> {
+    async getEventsByCalendarId(calendarId: number) {
         const sql = `SELECT * FROM "${this.tableName}" WHERE calendar_id = $1`;
 
         try {
@@ -53,7 +54,7 @@ class EventDao {
         }
     }
 
-    async getEventById(eventId: string): Promise<Query> {
+    async getEventById(eventId: string) {
         const sql = `SELECT * FROM "${this.tableName}" WHERE event_id = $1`;
         try {
             const { rows } = await query(sql, [eventId]);
@@ -64,7 +65,7 @@ class EventDao {
         }
     }
 
-    async putEventById(eventId: string, event: PutEventDto): Promise<Query> {
+    async putEventById(eventId: string, event: PutEventDto) {
         const sql = `UPDATE "${this.tableName}" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6 WHERE calendar_id = $7 and event_id = $1`;
         try {
             const { rows } = await query(sql, [
@@ -83,10 +84,7 @@ class EventDao {
         }
     }
 
-    async patchEventById(
-        eventId: string,
-        event: PatchEventDto
-    ): Promise<Query> {
+    async patchEventById(eventId: string, event: PatchEventDto) {
         const sql = `UPDATE "${this.tableName}" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6 WHERE calendar_id = $7 and event_id = $1`;
         try {
             const { rows } = await query(sql, [
@@ -114,5 +112,3 @@ class EventDao {
         }
     }
 }
-
-export default EventDao;
