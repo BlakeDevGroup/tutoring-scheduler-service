@@ -3,14 +3,15 @@ import BodyValidationMiddleware from "../common/middleware/body.validation.middl
 import express from "express";
 import seriesController from "./controllers/series.controller";
 import seriesMiddleware from "./middleware/series.middleware";
+import { CommonRouterConfig } from "../common/common.router.config";
 
-export class SeriesRoutes extends CommonRoutesConfig {
-    constructor(app: express.Application) {
-        super(app, "SeriesRoutes");
+export class SeriesRouter extends CommonRouterConfig {
+    constructor() {
+        super("SeriesRouter");
     }
 
-    configureRoutes(): express.Application {
-        this.app
+    configureRouter(): express.Router {
+        this.router
             .route(`/series`)
             .get(seriesController.listSeries)
             .post([
@@ -18,9 +19,9 @@ export class SeriesRoutes extends CommonRoutesConfig {
                 seriesController.createSeries,
             ]);
 
-        this.app.param(`seriesId`, seriesMiddleware.extractSeriesId);
+        this.router.param(`seriesId`, seriesMiddleware.extractSeriesId);
 
-        this.app
+        this.router
             .route(`/series/:seriesId`)
             .all(seriesMiddleware.validateSeriesExists)
             .get(seriesController.getSeriesById)
@@ -28,6 +29,6 @@ export class SeriesRoutes extends CommonRoutesConfig {
             .put(seriesController.put)
             .patch(seriesController.patch);
 
-        return this.app;
+        return this.router;
     }
 }

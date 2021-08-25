@@ -5,9 +5,7 @@ import * as expressWinston from "express-winston";
 import cors from "cors";
 import { CommonRoutesConfig } from "./server/common/common.routes.config";
 import { UsersRoutes } from "./server/users/users.routes.config";
-import { EventRoutes } from "./server/events/event.routes.config";
 import { CalendarRoutes } from "./server/calendars/calendar.routes.config";
-import { SeriesRoutes } from "./server/series/series.routes.config";
 import { PaymentOverrideRoutes } from "./server/payment_overrides/payment_override.routes.config";
 import { CancellationRoutes } from "./server/cancellations/cancellation.routes.config";
 import { CompanyRoutes } from "./server/companies/company.routes.config";
@@ -34,16 +32,14 @@ const loggerOptions: expressWinston.LoggerOptions = {
 };
 
 if (!process.env.DEBUG) {
-    loggerOptions.meta = false;
+    loggerOptions.meta = true;
 }
 
 app.use(expressWinston.logger(loggerOptions));
 
 routes.push(new UsersRoutes(app));
-routes.push(new EventRoutes(app));
 routes.push(new CalendarRoutes(app));
 routes.push(new PaymentOverrideRoutes(app));
-routes.push(new SeriesRoutes(app));
 routes.push(new CancellationRoutes(app));
 routes.push(new CompanyRoutes(app));
 
