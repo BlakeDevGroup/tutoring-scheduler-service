@@ -22,7 +22,7 @@ class EventsController {
     }
 
     async createEvent(req: express.Request, res: express.Response) {
-        const event = await this.eventService.create(req.body);
+        await this.eventService.create(req.body);
 
         res.status(200).send({
             success: "Event Successfully Created",
@@ -32,19 +32,25 @@ class EventsController {
     async patch(req: express.Request, res: express.Response) {
         log(await this.eventService.patchById(req.body.eventId, req.body));
 
-        res.status(204).send();
+        res.status(204).send({
+            success: `Event id:${req.body.eventId} successfully Patched`,
+        });
     }
 
     async put(req: express.Request, res: express.Response) {
         log(await this.eventService.putById(req.body.eventId, req.body));
 
-        res.status(204).send();
+        res.status(204).send({
+            success: `Event id:${req.body.eventId} successfully Updated`,
+        });
     }
 
     async removeEvent(req: express.Request, res: express.Response) {
         log(await this.eventService.deleteById(req.body.eventId));
 
-        res.status(204).send();
+        res.status(204).send({
+            success: `Event id:${req.body.eventId} successfully Deleted`,
+        });
     }
 }
 
