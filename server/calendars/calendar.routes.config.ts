@@ -1,7 +1,11 @@
 import { CommonRoutesConfig } from "../common/common.routes.config";
 import CalendarController from "./controllers/calendar.controller";
 import express from "express";
+import { Router } from "express";
 import CalendarMiddleware from "./middleware/calendar.middleware";
+
+import { EventRouter } from "../events/event.router.config";
+import { SeriesRouter } from "../series/series.router.config";
 
 export class CalendarRoutes extends CommonRoutesConfig {
     constructor(app: express.Application) {
@@ -22,6 +26,15 @@ export class CalendarRoutes extends CommonRoutesConfig {
 
         this.app.put(`/calendars/:calendarId`, [CalendarController.put]);
         this.app.patch(`/calendars/:calendarId`, [CalendarController.patch]);
+
+        this.app.use(
+            `/calendars/:calendarId`,
+            new EventRouter().configureRouter()
+        );
+        this.app.use(
+            `/calendars/:calendarId`,
+            new SeriesRouter().configureRouter()
+        );
 
         return this.app;
     }

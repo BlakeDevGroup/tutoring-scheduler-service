@@ -5,28 +5,34 @@ import { PutEventDto } from "../dtos/put.event.dto";
 import EventDao from "../daos/event.dao";
 
 class EventService implements CRUD {
+    private eventDao: EventDao = new EventDao();
+
     async create(resource: CreateEventDto) {
-        return EventDao.addEvent(resource);
+        return this.eventDao.addEvent(resource);
     }
 
     async deleteById(id: string) {
-        return EventDao.removeEventById(id);
+        return this.eventDao.removeEventById(id);
     }
 
     async list(limit: number, page: number) {
-        return EventDao.getEvents();
+        return this.eventDao.getEvents();
     }
 
     async patchById(id: string, resource: PatchEventDto) {
-        return EventDao.patchEventById(id, resource);
+        return this.eventDao.patchEventById(id, resource);
     }
 
     async putById(id: string, resource: PutEventDto) {
-        return EventDao.putEventById(id, resource);
+        return this.eventDao.putEventById(id, resource);
     }
 
     async readById(id: string) {
-        return EventDao.getEventById(id);
+        return this.eventDao.getEventById(id);
+    }
+
+    async listByCalendarId(calendarId: string, limit: number, page: number) {
+        return this.eventDao.getEventsByCalendarId(calendarId);
     }
 }
 

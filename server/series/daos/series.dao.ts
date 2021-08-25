@@ -16,20 +16,23 @@ class SeriesDao {
 
     async addSeries(series: CreateSeriesDto): Promise<Query> {
         const sql = `
-            INSERT INTO "${this.tableName}" (title, description, recurrence, start, end, series_id)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO "${this.tableName}" (title, description, recurrence, start, end, calendar_id)
+            VALUES ($1, $2, $3, $4, $5, 1)
         `;
+        try {
+            const { rows } = await query(sql, [
+                series.title,
+                series.description,
+                series.recurrence,
+                series.start,
+                series.end,
+                series.calendarId,
+            ]);
 
-        const { rows } = await query(sql, [
-            series.title,
-            series.description,
-            series.recurrence,
-            series.start,
-            series.end,
-            series.calendarId,
-        ]);
-
-        return rows[0];
+            return rows[0];
+        } catch (error) {
+            return error;
+        }
     }
 
     async getSeries(): Promise<Query> {
@@ -37,9 +40,13 @@ class SeriesDao {
             SELECT * FROM "${this.tableName}"
         `;
 
-        const { rows } = await query(sql, []);
+        try {
+            const { rows } = await query(sql, []);
 
-        return rows;
+            return rows;
+        } catch (error) {
+            return error;
+        }
     }
 
     async getSeriesById(seriesId: string): Promise<Query> {
@@ -47,10 +54,13 @@ class SeriesDao {
             SELECT * FROM "${this.tableName}"
             WHERE series_id = $1
         `;
+        try {
+            const { rows } = await query(sql, [seriesId]);
 
-        const { rows } = await query(sql, [seriesId]);
-
-        return rows[0];
+            return rows[0];
+        } catch (error) {
+            return error;
+        }
     }
 
     async putSeriesById(
@@ -63,18 +73,21 @@ class SeriesDao {
             end = $6, calendar_id = $7
             WHERE series_id = $1
         `;
+        try {
+            const { rows } = await query(sql, [
+                seriesId,
+                series.title,
+                series.description,
+                series.recurrence,
+                series.start,
+                series.end,
+                series.calendarId,
+            ]);
 
-        const { rows } = await query(sql, [
-            seriesId,
-            series.title,
-            series.description,
-            series.recurrence,
-            series.start,
-            series.end,
-            series.calendarId,
-        ]);
-
-        return rows[0];
+            return rows[0];
+        } catch (error) {
+            return error;
+        }
     }
 
     async patchSeriesById(
@@ -87,26 +100,32 @@ class SeriesDao {
             end = $6, calendar_id = $7
             WHERE series_id = $1
         `;
+        try {
+            const { rows } = await query(sql, [
+                seriesId,
+                series.title,
+                series.description,
+                series.recurrence,
+                series.start,
+                series.end,
+                series.calendarId,
+            ]);
 
-        const { rows } = await query(sql, [
-            seriesId,
-            series.title,
-            series.description,
-            series.recurrence,
-            series.start,
-            series.end,
-            series.calendarId,
-        ]);
-
-        return rows[0];
+            return rows[0];
+        } catch (error) {
+            return error;
+        }
     }
 
     async removeSeriesById(seriesId: string) {
         const sql = `
             DELETE FROM "${this.tableName}" WHERE series_id = $1
         `;
-
-        return await query(sql, [seriesId]);
+        try {
+            return await query(sql, [seriesId]);
+        } catch (error) {
+            return error;
+        }
     }
 }
 

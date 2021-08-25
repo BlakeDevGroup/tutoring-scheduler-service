@@ -12,8 +12,8 @@ class EventMiddleware {
     ) {
         if (
             this.startDateIsLessThanEndDate(
-                req.body.start_date,
-                req.body.end_date
+                req.body.date_start,
+                req.body.date_end
             )
         ) {
             next();
@@ -23,7 +23,6 @@ class EventMiddleware {
             });
         }
     }
-
     private startDateIsLessThanEndDate(startDate: string, endDate: string) {
         return new Date(startDate) < new Date(endDate);
     }
@@ -51,6 +50,17 @@ class EventMiddleware {
     ) {
         req.body.eventId = req.params.eventId;
         next();
+    }
+
+    async datesAreValid(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        const startDate = new Date(req.body.start_date);
+        const endDate = new Date(req.body.end_date);
+
+        return !(isNaN(startDate.getTime()) && isNaN(endDate.getTime()));
     }
 }
 

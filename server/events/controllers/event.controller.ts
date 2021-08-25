@@ -6,7 +6,11 @@ const log: debug.IDebugger = debug("app:event-controller");
 
 class EventsController {
     async listEvents(req: express.Request, res: express.Response) {
-        const events = await EventService.list(100, 0);
+        const events = await EventService.listByCalendarId(
+            req.body.calendarId,
+            100,
+            0
+        );
         res.status(200).send(events);
     }
 
@@ -18,7 +22,9 @@ class EventsController {
     async createEvent(req: express.Request, res: express.Response) {
         const event = await EventService.create(req.body);
 
-        res.status(200).send(event);
+        res.status(200).send({
+            success: "Event Successfully Created",
+        });
     }
 
     async patch(req: express.Request, res: express.Response) {

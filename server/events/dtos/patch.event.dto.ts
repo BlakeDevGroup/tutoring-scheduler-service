@@ -3,4 +3,6 @@ export interface PatchEventDto {
     dateEnd: string;
     allDay: Boolean;
     title: string;
+    calendarId: string;
+    userId: string;
 }
