@@ -4,7 +4,7 @@ import express from "express";
 import { Router } from "express";
 import CalendarMiddleware from "./middleware/calendar.middleware";
 
-import { EventRouter } from "../events/event.router.config";
+import EventRouter from "../events/routes/event.router";
 import { SeriesRouter } from "../series/series.router.config";
 
 export class CalendarRoutes extends CommonRoutesConfig {
