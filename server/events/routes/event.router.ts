@@ -1,12 +1,12 @@
-import { CommonRoutesConfig } from "../common/common.routes.config";
-import EventsController from "./controllers/event.controller";
-import eventsMiddleware from "./middleware/event.middleware";
-import BodyValidationMiddleware from "../common/middleware/body.validation.middleware";
+import { CommonRoutesConfig } from "../../common/common.routes.config";
+import EventsController from "../controllers/event.controller";
+import eventsMiddleware from "../middleware/event.middleware";
+import BodyValidationMiddleware from "../../common/middleware/body.validation.middleware";
 import express from "express";
-import { CommonRouterConfig } from "../common/common.router.config";
+import { CommonRouterConfig } from "../../common/common.router.config";
 import { body } from "express-validator";
 
-export class EventRouter extends CommonRouterConfig {
+export default class EventRouter extends CommonRouterConfig {
     constructor() {
         super("EventRouter");
     }
