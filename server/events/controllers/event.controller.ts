@@ -5,8 +5,13 @@ import debug from "debug";
 const log: debug.IDebugger = debug("app:event-controller");
 
 class EventsController {
-    private eventService: EventService = new EventService();
+    private eventService: EventService;
+
+    constructor() {
+        this.eventService = new EventService();
+    }
     async listEvents(req: express.Request, res: express.Response) {
+        console.log(this);
         const events = await this.eventService.listByCalendarId(
             req.body.calendarId,
             req.body.limit || 100,
@@ -54,4 +59,4 @@ class EventsController {
     }
 }
 
-export default new EventsController();
+export default EventsController;

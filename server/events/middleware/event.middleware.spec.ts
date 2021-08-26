@@ -3,19 +3,21 @@ import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
 import { createResponse, createRequest } from "node-mocks-http";
-import eventMiddleware from "./event.middleware";
+import EventMiddleware from "./event.middleware";
 import express from "express";
 import EventService from "../services/event.service";
 
 describe("EventMiddleware", () => {
     let next: express.NextFunction;
+    let eventMiddleware: EventMiddleware;
     beforeEach(() => {
         next = sinon.stub().callsFake(() => {});
+        eventMiddleware = new EventMiddleware();
     });
     afterEach(() => {
         sinon.restore();
     });
-    describe("method:validateDates", async () => {
+    describe("method:startDateIsLessThanEndDate", async () => {
         it("should call next() when dates are in format:MM-DD-YYYY and date_end is after date_start", async () => {
             const body = {
                 date_start: "08-15-2021",
@@ -26,7 +28,7 @@ describe("EventMiddleware", () => {
             });
             let res = createResponse();
 
-            await eventMiddleware.validateDates(req, res, next);
+            await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
 
             expect(next).calledOnce;
             expect(res.statusCode).to.equal(200);
@@ -41,12 +43,12 @@ describe("EventMiddleware", () => {
             });
             let res = createResponse();
 
-            await eventMiddleware.validateDates(req, res, next);
+            await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
 
             expect(next).calledOnce;
             expect(res.statusCode).to.equal(200);
         });
-        it("should call next() when dates include time and are in format:yyyy-mm-ddThh:mm and date_end is after date_start", async () => {
+        it("should call next() when dates include time and are in format:YYYY-MM-DDTHH:mm and date_end is after date_start", async () => {
             const body = {
                 date_start: "2021-08-15T15:30",
                 date_end: "2021-08-15T15:45",
@@ -56,7 +58,7 @@ describe("EventMiddleware", () => {
             });
             let res = createResponse();
 
-            await eventMiddleware.validateDates(req, res, next);
+            await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
 
             expect(next).calledOnce;
             expect(res.statusCode).to.equal(200);
@@ -72,13 +74,13 @@ describe("EventMiddleware", () => {
             });
             let res = createResponse();
 
-            await eventMiddleware.validateDates(req, res, next);
+            await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
 
             expect(next).not.called;
             expect(res.statusCode).to.equal(400);
             expect(res._getData()).to.include.keys("error");
             expect(res._getData().error).to.equal(
-                `End date (${req.body.end_date}) occurs before start date (${req.body.start_date})`
+                `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
             );
         });
 
@@ -92,13 +94,13 @@ describe("EventMiddleware", () => {
             });
             let res = createResponse();
 
-            await eventMiddleware.validateDates(req, res, next);
+            await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
 
             expect(next).not.called;
             expect(res.statusCode).to.equal(400);
             expect(res._getData()).to.include.keys("error");
             expect(res._getData().error).to.equal(
-                `End date (${req.body.end_date}) occurs before start date (${req.body.start_date})`
+                `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
             );
         });
 
@@ -112,13 +114,13 @@ describe("EventMiddleware", () => {
             });
             let res = createResponse();
 
-            await eventMiddleware.validateDates(req, res, next);
+            await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
 
             expect(next).not.called;
             expect(res.statusCode).to.equal(400);
             expect(res._getData()).to.include.keys("error");
             expect(res._getData().error).to.equal(
-                `End date (${req.body.end_date}) occurs before start date (${req.body.start_date})`
+                `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
             );
         });
     });
@@ -218,72 +220,48 @@ describe("EventMiddleware", () => {
     });
 
     describe("method:datesAreValid", () => {
-        it("should call next() if start_date and end_date are valid JS date strings", async () => {
-            const body = {
-                start_date: "2018-09-10",
-                end_date: "2018-09-10",
-            };
-            let req = createRequest({ body });
-            let res = createResponse();
+        it("should return true if date is valid JS Date string of format:YYYY-MM-DD", async () => {
+            const result: Boolean = await eventMiddleware.isDateValid(
+                "1994-04-13"
+            );
 
-            await eventMiddleware.datesAreValid(req, res, next);
-
-            expect(next).to.have.been.calledOnce;
-            expect(res.statusCode).to.equal(200);
+            expect(result).to.equal(true);
         });
 
-        it("should send error and status code 400 if start_date is invalid", async () => {
-            const body = {
-                start_date: "XXXX",
-                end_date: "2018-09-10",
-            };
-            let req = createRequest({ body });
-            let res = createResponse();
-
-            await eventMiddleware.datesAreValid(req, res, next);
-
-            expect(next).to.have.not.been.called;
-            expect(res.statusCode).to.equal(400);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
-                "The following dates are invalid: start_date"
+        it("should return true if date is valid JS Date string of format:MM-DD-YYYY", async () => {
+            const result: Boolean = await eventMiddleware.isDateValid(
+                "04-13-1994"
             );
+
+            expect(result).to.equal(true);
         });
 
-        it("should send error and status code 400 if end_date is invalid", async () => {
-            const body = {
-                start_date: "2018-09-10",
-                end_date: "XXXX",
-            };
-            let req = createRequest({ body });
-            let res = createResponse();
-
-            await eventMiddleware.datesAreValid(req, res, next);
-
-            expect(next).to.have.not.been.called;
-            expect(res.statusCode).to.equal(400);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
-                "The following dates are invalid: end_date"
+        it("should return true if date is valid JS Date string of format:YYYY-MM-DDTHH:mmZ", async () => {
+            const result: Boolean = await eventMiddleware.isDateValid(
+                "1994-04-13T01:01Z"
             );
+
+            expect(result).to.equal(true);
         });
 
-        it("should send error and status code 400 if start_date and end_date is invalid", async () => {
-            const body = {
-                start_date: "XXXX",
-                end_date: "XXXX",
-            };
-            let req = createRequest({ body });
-            let res = createResponse();
-
-            await eventMiddleware.datesAreValid(req, res, next);
-
-            expect(next).to.have.not.been.called;
-            expect(res.statusCode).to.equal(400);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
-                "The following dates are invalid: start_date, end_date"
+        it("should return false if date is in format:MM-DD-YYYYTHH:mmZ", async () => {
+            const result: Boolean = await eventMiddleware.isDateValid(
+                "04-13-1994T23:23Z"
             );
+
+            expect(result).to.equal(false);
+        });
+
+        it("should return false if date is invalid JS Date string", async () => {
+            const result: Boolean = await eventMiddleware.isDateValid("XXXX");
+
+            expect(result).to.equal(false);
+        });
+
+        it("should return true if date is invalid JS Date string", async () => {
+            const result: Boolean = await eventMiddleware.isDateValid("XXXX");
+
+            expect(result).to.equal(false);
         });
     });
 });

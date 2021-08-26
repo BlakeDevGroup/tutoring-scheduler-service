@@ -8,7 +8,6 @@ export abstract class CommonRouterConfig {
     constructor(name: string) {
         this.name = name;
         this.router = express.Router();
-        this.configureRouter();
     }
 
     getName() {

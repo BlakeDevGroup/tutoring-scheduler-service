@@ -3,10 +3,11 @@ import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
 import EventService from "../services/event.service";
-import eventController from "./event.controller";
+import EventController from "./event.controller";
 import express from "express";
 import { createRequest, createResponse } from "node-mocks-http";
 import { http } from "winston";
+import EventsController from "./event.controller";
 
 const EVENT_DATA = [
     {
@@ -38,9 +39,12 @@ const FAIL_RESULT = "REQUEST FAILED";
 const CALENDAR_ID = 1,
     EVENT_ID = 1;
 let eventServiceStub = sinon.stub();
+let eventController: EventsController;
 
 describe("EventController", () => {
-    beforeEach(() => {});
+    beforeEach(() => {
+        eventController = new EventController();
+    });
     afterEach(() => {
         sinon.restore();
         eventServiceStub.reset();
