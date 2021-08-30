@@ -37,11 +37,11 @@ export default class EventRouter extends CommonRouterConfig {
                 this.eventsController.createEvent.bind(this.eventsController),
             ]);
         this.router.param(
-            `eventId`,
+            `event_id`,
             this.eventsMiddleware.extractEventId.bind(this.eventsMiddleware)
         );
         this.router
-            .route(`/events/:eventId`)
+            .route(`/events/:event_id`)
             .all(
                 this.eventsMiddleware.validateEventExists.bind(
                     this.eventsMiddleware

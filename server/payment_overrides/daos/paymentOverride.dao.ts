@@ -2,7 +2,7 @@ import { CreatePaymentOverrideDto } from "../dtos/create.paymentOverride.dto";
 import { PatchPaymentOverrideDto } from "../dtos/patch.paymentOverride.dto";
 import { PutPaymentOverrideDto } from "../dtos/put.paymentOverride.dto";
 import debug from "debug";
-import { query } from "../../common/services/postgres";
+import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
 
 const log: debug.IDebugger = debug(`app:payment_override-dao`);

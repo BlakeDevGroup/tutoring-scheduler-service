@@ -6,7 +6,21 @@ import { createResponse, createRequest } from "node-mocks-http";
 import EventMiddleware from "./event.middleware";
 import express from "express";
 import EventService from "../services/event.service";
+import { ServerResponsePayload } from "../../common/services/message/message.service";
 
+const RESOLVED: ServerResponsePayload = {
+    message: "Success",
+    statusCode: 200,
+    data: [],
+    success: true,
+};
+
+const FAILED: ServerResponsePayload = {
+    message: "Failed",
+    statusCode: 404,
+    error: new Error("Failed"),
+    success: false,
+};
 describe("EventMiddleware", () => {
     let next: express.NextFunction;
     let eventMiddleware: EventMiddleware;
@@ -75,13 +89,15 @@ describe("EventMiddleware", () => {
             let res = createResponse();
 
             await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
-
+            const data = res._getData();
             expect(next).not.called;
             expect(res.statusCode).to.equal(400);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
+
+            expect(data).to.include.keys("error", "message", "success");
+            expect(data.message).to.equal(
                 `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
             );
+            expect(data.success).to.equal(false);
         });
 
         it("should throw error when dates are in format:YYYY-MM-DD but date_end is before date_start", async () => {
@@ -95,13 +111,16 @@ describe("EventMiddleware", () => {
             let res = createResponse();
 
             await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
+            const data = res._getData();
 
             expect(next).not.called;
             expect(res.statusCode).to.equal(400);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
+
+            expect(data).to.include.keys("error", "message", "success");
+            expect(data.message).to.equal(
                 `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
             );
+            expect(data.success).to.equal(false);
         });
 
         it("should throw error when dates are in format:yyyy-mm-ddThh:mm but date_end is before date_start", async () => {
@@ -115,13 +134,15 @@ describe("EventMiddleware", () => {
             let res = createResponse();
 
             await eventMiddleware.startDateIsLessThanEndDate(req, res, next);
+            const data = res._getData();
 
             expect(next).not.called;
             expect(res.statusCode).to.equal(400);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
+            expect(data).to.include.keys("error", "message", "success");
+            expect(data.message).to.equal(
                 `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
             );
+            expect(data.success).to.equal(false);
         });
     });
 
@@ -131,8 +152,8 @@ describe("EventMiddleware", () => {
             eventStub = sinon.stub(EventService.prototype, "readById");
         });
         it("should call next() if eventId exists in event collection", async () => {
-            eventStub.resolves(true);
-            const params = { eventId: 1 };
+            eventStub.resolves(RESOLVED);
+            const params = { event_id: 1 };
 
             let req = createRequest({ params });
             let res = createResponse();
@@ -140,80 +161,45 @@ describe("EventMiddleware", () => {
             await eventMiddleware.validateEventExists(req, res, next);
 
             expect(eventStub).to.have.been.calledOnce;
-            expect(eventStub).to.have.been.calledWith(params.eventId);
+            expect(eventStub).to.have.been.calledWith(params.event_id);
             expect(next).to.have.been.calledOnce;
             expect(res.statusCode).to.equal(200);
         });
 
-        it("should throw error if event is undefined", async () => {
-            eventStub.resolves(undefined);
+        it("should throw error if event is not found", async () => {
+            eventStub.resolves(FAILED);
 
-            const params = { eventId: 1 };
+            const params = { event_id: 1 };
             let req = createRequest({ params });
             let res = createResponse();
 
             await eventMiddleware.validateEventExists(req, res, next);
 
             expect(eventStub).to.have.been.calledOnce;
-            expect(eventStub).to.have.been.calledWith(params.eventId);
+            expect(eventStub).to.have.been.calledWith(params.event_id);
             expect(next).to.have.not.been.called;
             expect(res.statusCode).to.be.equal(404);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
-                `Event ${req.params.eventId} not found`
+            expect(res._getData()).to.include.keys(
+                "error",
+                "message",
+                "success"
             );
-        });
-
-        it("should throw error if event is null", async () => {
-            eventStub.resolves(null);
-
-            const params = { eventId: 1 };
-            let req = createRequest({ params });
-            let res = createResponse();
-
-            await eventMiddleware.validateEventExists(req, res, next);
-
-            expect(eventStub).to.have.been.calledOnce;
-            expect(eventStub).to.have.been.calledWith(params.eventId);
-            expect(next).to.have.not.been.called;
-            expect(res.statusCode).to.be.equal(404);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
-                `Event ${req.params.eventId} not found`
-            );
-        });
-
-        it('should throw error if event is ""', async () => {
-            eventStub.resolves("");
-
-            const params = { eventId: 1 };
-            let req = createRequest({ params });
-            let res = createResponse();
-
-            await eventMiddleware.validateEventExists(req, res, next);
-
-            expect(eventStub).to.have.been.calledOnce;
-            expect(eventStub).to.have.been.calledWith(params.eventId);
-            expect(next).to.have.not.been.called;
-            expect(res.statusCode).to.be.equal(404);
-            expect(res._getData()).to.include.keys("error");
-            expect(res._getData().error).to.equal(
-                `Event ${req.params.eventId} not found`
-            );
+            expect(res._getData().message).to.equal(`Failed`);
+            expect(res._getData().success).to.equal(false);
         });
     });
 
     describe("method:extractEventId", () => {
-        it("should store req.params.eventId to req.body.eventId and call next()", async () => {
-            const params = { eventId: 1 };
+        it("should store req.params.event_id to req.body.event_id and call next()", async () => {
+            const params = { event_id: 1 };
             let req = createRequest({ params });
             let res = createResponse();
 
             await eventMiddleware.extractEventId(req, res, next);
 
             expect(req).to.include.keys("body");
-            expect(req.body).to.include.keys("eventId");
-            expect(req.body.eventId).to.equal(params.eventId);
+            expect(req.body).to.include.keys("event_id");
+            expect(req.body.event_id).to.equal(params.event_id);
             expect(res.statusCode).to.equal(200);
             expect(next).to.have.been.calledOnce;
         });

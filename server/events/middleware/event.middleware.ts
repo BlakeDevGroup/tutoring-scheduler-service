@@ -1,6 +1,7 @@
 import express from "express";
 import EventService from "../services/event.service";
 import debug from "debug";
+import { sendFailure } from "../../common/services/message/message.service";
 
 const log: debug.IDebugger = debug("app:event-middleware");
 
@@ -17,9 +18,14 @@ class EventMiddleware {
         if (formattedStartDate < formattedEndDate) {
             next();
         } else {
-            res.status(400).send({
-                error: `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`,
-            });
+            res.status(400).send(
+                sendFailure(
+                    `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`,
+                    new Error(
+                        `date_end (${req.body.date_end}) occurs before date_start (${req.body.date_start})`
+                    )
+                )
+            );
         }
     }
 
@@ -28,14 +34,12 @@ class EventMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const event = await this.eventService.readById(req.params.eventId);
+        const event = await this.eventService.readById(req.params.event_id);
 
-        if (event) {
+        if (event.success) {
             next();
         } else {
-            res.status(404).send({
-                error: `Event ${req.params.eventId} not found`,
-            });
+            res.status(event.statusCode).send(event);
         }
     }
 
@@ -44,7 +48,7 @@ class EventMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        req.body.eventId = req.params.eventId;
+        req.body.event_id = req.params.event_id;
         next();
     }
 

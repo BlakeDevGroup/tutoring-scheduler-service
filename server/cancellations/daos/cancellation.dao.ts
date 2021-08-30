@@ -2,7 +2,7 @@ import { CreateCancellationDto } from "../dtos/create.cancellation.dto";
 import { PatchCancellationDto } from "../dtos/patch.cancellation.dto";
 import { PutCancellationDto } from "../dtos/put.cancellation.dto";
 import debug from "debug";
-import { query } from "../../common/services/postgres";
+import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
 
 const log: debug.IDebugger = debug("app:cancellation-dao");

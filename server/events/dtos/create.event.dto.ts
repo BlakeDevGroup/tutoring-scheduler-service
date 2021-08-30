@@ -1,9 +1,9 @@
 export interface CreateEventDto {
     // event_id: string;
-    dateStart: string;
-    dateEnd: string;
-    allDay: Boolean;
+    date_start: string;
+    date_end: string;
+    all_day: Boolean;
     title: string;
-    calendarId: number;
-    userId: number;
+    calendar_id: number;
+    user_id: number;
 }

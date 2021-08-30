@@ -1,7 +1,8 @@
-import sinon, { SinonSandbox, SinonStub, spy } from "sinon";
-import chai, { expect, should } from "chai";
+import sinon from "sinon";
+import { expect } from "chai";
 import request from "supertest";
 import express from "express";
+
 import EventRouter from "./event.router";
 
 // import app from "../../../app";
@@ -14,9 +15,11 @@ type Payload = {
 };
 let PAYLOAD: Payload;
 let app: express.Application;
+
 app = express();
 app.use(express.json());
 app.use("/", new EventRouter().configureRouter());
+
 describe("EventRouter", () => {
     beforeEach(() => {
         PAYLOAD = {
@@ -34,19 +37,29 @@ describe("EventRouter", () => {
         it("should send all events of calendar_id", async () => {
             const response = await request(app)
                 .get("/events")
-                .send({ calendarId: 1 });
+                .send({ calendar_id: 1 });
 
             expect(response.statusCode).to.equal(200);
-            expect(response.body).to.be.an("array");
-            expect(response.body.length).to.be.greaterThan(0);
-            expect(response.body[0]).to.be.an("object");
-            expect(response.body[0]).to.have.own.property("date_end");
-            expect(response.body[0]).to.have.own.property("date_start");
-            expect(response.body[0]).to.have.own.property("event_id");
-            expect(response.body[0]).to.have.own.property("title");
-            expect(response.body[0]).to.have.own.property("all_day");
-            expect(response.body[0]).to.have.own.property("user_id");
-            expect(response.body[0]).to.have.own.property("calendar_id");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "data");
+
+            expect(response.body.success).to.equal(true);
+            expect(response.body.message).to.equal(
+                "Successfully retrieved events"
+            );
+            expect(response.body.data).to.be.an("array");
+            expect(response.body.data[0])
+                .to.be.an("object")
+                .and.include.keys(
+                    "date_end",
+                    "date_start",
+                    "event_id",
+                    "title",
+                    "all_day",
+                    "user_id",
+                    "calendar_id"
+                );
         });
 
         it("should send an empty array when there are no events on calendar_id", async () => {
@@ -55,26 +68,45 @@ describe("EventRouter", () => {
                 .send({ calendarId: 99999 });
 
             expect(response.statusCode).to.equal(200);
-            expect(response.body).to.be.an("array");
-            expect(response.body.length).to.equal(0);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "data");
+
+            expect(response.body.success).to.equal(true);
+            expect(response.body.message).to.equal(
+                "Successfully retrieved events"
+            );
+            expect(response.body.data).to.deep.equal([]);
         });
     });
 
     describe("GET /events/:id", () => {
         it("should send event when event_id exists on calendar_id", async () => {
             const response = await request(app)
-                .get("/events/1")
+                .get("/events/35")
                 .send({ calendarId: 1 });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body).to.be.an("object");
-            expect(response.body).to.have.own.property("date_end");
-            expect(response.body).to.have.own.property("date_start");
-            expect(response.body).to.have.own.property("event_id");
-            expect(response.body).to.have.own.property("title");
-            expect(response.body).to.have.own.property("all_day");
-            expect(response.body).to.have.own.property("user_id");
-            expect(response.body).to.have.own.property("calendar_id");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "data");
+
+            expect(response.body.success).to.equal(true);
+            expect(response.body.message).to.equal(
+                "Successfully retrieved event"
+            );
+            expect(response.body.data)
+                .to.be.an("object")
+                .and.include.keys(
+                    "date_end",
+                    "date_start",
+                    "event_id",
+                    "title",
+                    "all_day",
+                    "user_id",
+                    "calendar_id"
+                );
         });
 
         it("should send error when event_id does not exist on calendar_id", async () => {
@@ -84,9 +116,13 @@ describe("EventRouter", () => {
                 .send({ calendarId: 1 });
 
             expect(response.statusCode).to.equal(404);
-            expect(response.body).to.be.an("object");
-            expect(response.body).to.have.own.property("error");
-            expect(response.body.error).to.equal(`Event ${EVENT_ID} not found`);
+            expect(response.body)
+                .to.be.an("object")
+                .and.includes.keys("success", "message", "error", "statusCode");
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `No event found with id: ${EVENT_ID}`
+            );
         });
     });
 
@@ -104,15 +140,14 @@ describe("EventRouter", () => {
                 );
 
             expect(response.statusCode).to.equal(400);
-            expect(response.body).to.be.an("object").and.include.keys("error");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "message", "statusCode", "success");
 
-            expect(response.body.error).to.be.an("array");
-            expect(response.body.error[0]).to.deep.equal({
-                location: "body",
-                msg: "Invalid value",
-                param: "date_start",
-                value: VALUE,
-            });
+            expect(response.body.message).to.equal(
+                "Invalid Value for param: date_start value: XXXX"
+            );
+            expect(response.body.success).to.equal(false);
         });
 
         it("should throw error when date_end is not a valid JS Date string", async () => {
@@ -128,15 +163,14 @@ describe("EventRouter", () => {
                 );
 
             expect(response.statusCode).to.equal(400);
-            expect(response.body).to.be.an("object").and.include.keys("error");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "message", "statusCode", "success");
 
-            expect(response.body.error).to.be.an("array");
-            expect(response.body.error[0]).to.deep.equal({
-                location: "body",
-                msg: "Invalid value",
-                param: "date_end",
-                value: VALUE,
-            });
+            expect(response.body.message).to.equal(
+                "Invalid Value for param: date_end value: XXXX"
+            );
+            expect(response.body.success).to.equal(false);
         });
 
         it("should throw error when date_end is a date before date_start", async () => {
@@ -152,12 +186,14 @@ describe("EventRouter", () => {
                 );
 
             expect(response.statusCode).to.equal(400);
-            expect(response.body).to.be.an("object").and.include.keys("error");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "message", "statusCode", "success");
 
-            expect(response.body.error).to.be.an("string");
-            expect(response.body.error).to.equal(
+            expect(response.body.message).to.equal(
                 `date_end (${VALUE}) occurs before date_start (${PAYLOAD.date_start})`
             );
+            expect(response.body.success).to.equal(false);
         });
 
         it("should throw error when title is not a string", async () => {
@@ -173,15 +209,14 @@ describe("EventRouter", () => {
                 );
 
             expect(response.statusCode).to.equal(400);
-            expect(response.body).to.be.an("object").and.include.keys("error");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "message", "statusCode", "success");
 
-            expect(response.body.error).to.be.an("array");
-            expect(response.body.error[0]).to.deep.equal({
-                location: "body",
-                msg: "Invalid value",
-                param: "title",
-                value: VALUE,
-            });
+            expect(response.body.message).to.equal(
+                "Invalid Value for param: title value: 123"
+            );
+            expect(response.body.success).to.equal(false);
         });
 
         it("should throw error when all_day is not a boolean", async () => {
@@ -197,15 +232,14 @@ describe("EventRouter", () => {
                 );
 
             expect(response.statusCode).to.equal(400);
-            expect(response.body).to.be.an("object").and.include.keys("error");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "message", "statusCode", "success");
 
-            expect(response.body.error).to.be.an("array");
-            expect(response.body.error[0]).to.deep.equal({
-                location: "body",
-                msg: "Invalid value",
-                param: "all_day",
-                value: VALUE,
-            });
+            expect(response.body.message).to.equal(
+                "Invalid Value for param: all_day value: XXXX"
+            );
+            expect(response.body.success).to.equal(false);
         });
         it("should throw error when user_id is not a number", async () => {
             const VALUE = "XXXX";
@@ -220,15 +254,14 @@ describe("EventRouter", () => {
                 );
 
             expect(response.statusCode).to.equal(400);
-            expect(response.body).to.be.an("object").and.include.keys("error");
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "message", "statusCode", "success");
 
-            expect(response.body.error).to.be.an("array");
-            expect(response.body.error[0]).to.deep.equal({
-                location: "body",
-                msg: "Invalid value",
-                param: "user_id",
-                value: VALUE,
-            });
+            expect(response.body.message).to.equal(
+                "Invalid Value for param: user_id value: XXXX"
+            );
+            expect(response.body.success).to.equal(false);
         });
 
         it("should create a event on the specified calendar_id", async () => {
@@ -242,13 +275,204 @@ describe("EventRouter", () => {
                     })
                 );
 
+            expect(response.statusCode).to.equal(201);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "statusCode", "data", "message");
+
+            expect(response.body.success).to.equal(true);
+            expect(response.body.data).to.deep.equal([]);
+            expect(response.body.message).to.equal(
+                "Event created successfully"
+            );
+        });
+    });
+
+    describe("/events:id", () => {
+        it("should return error object and status code 404 when event is not found", async function () {
+            const response = await request(app)
+                .get("/events/9999")
+                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+
+            expect(response.statusCode).to.equal(404);
+            expect(response.body).to.be.an("object");
+            expect(response.body).to.include.keys(
+                "success",
+                "error",
+                "message"
+            );
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `No event found with id: 9999`
+            );
+        });
+        it("should throw error when date_start is not a valid JS Date string", async () => {
+            const VALUE = "XXXX";
+
+            const response = await request(app)
+                .put("/events/35")
+                .send(
+                    Object.assign(PAYLOAD, {
+                        calendar_id: 1,
+                        date_start: VALUE,
+                    })
+                );
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "success", "message");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid Value for param: date_start value: ${VALUE}`
+            );
+        });
+
+        it("should throw error when date_end is not a valid JS Date string", async () => {
+            const VALUE = "XXXX";
+
+            const response = await request(app)
+                .put("/events/35")
+                .send(
+                    Object.assign(PAYLOAD, {
+                        calendar_id: 1,
+                        date_end: VALUE,
+                    })
+                );
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "success", "message");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid Value for param: date_end value: ${VALUE}`
+            );
+        });
+
+        it("should throw error when title is not a string", async () => {
+            const VALUE = 123;
+
+            const response = await request(app)
+                .put("/events/35")
+                .send(
+                    Object.assign(PAYLOAD, {
+                        calendar_id: 1,
+                        title: VALUE,
+                    })
+                );
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "success", "message");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid Value for param: title value: ${VALUE}`
+            );
+        });
+
+        it("should throw error when all_day is not a boolean", async () => {
+            const VALUE = 123;
+
+            const response = await request(app)
+                .put("/events/35")
+                .send(
+                    Object.assign(PAYLOAD, {
+                        calendar_id: 1,
+                        all_day: VALUE,
+                    })
+                );
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "success", "message");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid Value for param: all_day value: ${VALUE}`
+            );
+        });
+
+        it("should throw error when user_id is not a number", async () => {
+            const VALUE = "XXXX";
+
+            const response = await request(app)
+                .put("/events/35")
+                .send(
+                    Object.assign(PAYLOAD, {
+                        calendar_id: 1,
+                        user_id: VALUE,
+                    })
+                );
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("error", "success", "message");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid Value for param: user_id value: ${VALUE}`
+            );
+        });
+
+        it("should update an event and send status 200 with event data", async () => {
+            const response = await request(app)
+                .put("/events/35")
+                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+
             expect(response.statusCode).to.equal(200);
             expect(response.body)
                 .to.be.an("object")
-                .and.include.keys("success");
+                .and.include.keys("data", "success", "message");
 
-            expect(response.body.success).to.equal(
-                "Event Successfully Created"
+            expect(response.body.success).to.equal(true);
+            expect(response.body.data).to.deep.equal(
+                Object.assign(PAYLOAD, { calendar_id: 1, event_id: "35" })
+            );
+            expect(response.body.message).to.equal(
+                `Successfully updated event id: 35`
+            );
+        });
+
+        it("should update an event and send status 200 with event data", async () => {
+            const response = await request(app)
+                .patch("/events/35")
+                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+
+            expect(response.statusCode).to.equal(200);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("data", "success", "message");
+
+            expect(response.body.success).to.equal(true);
+            expect(response.body.data).to.deep.equal(
+                Object.assign(PAYLOAD, { calendar_id: 1, event_id: "35" })
+            );
+            expect(response.body.message).to.equal(
+                `Successfully patched event id: 35`
+            );
+        });
+
+        it("should delete an event and send status 200", async () => {
+            const response = await request(app)
+                .delete("/events/35")
+                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+
+            expect(response.statusCode).to.equal(200);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("data", "success", "message");
+
+            expect(response.body.success).to.equal(true);
+            expect(response.body.data).to.deep.equal([]);
+            expect(response.body.message).to.equal(
+                "Successfully removed event"
             );
         });
     });

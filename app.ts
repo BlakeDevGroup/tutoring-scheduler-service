@@ -5,7 +5,7 @@ import * as expressWinston from "express-winston";
 import cors from "cors";
 import { CommonRoutesConfig } from "./server/common/common.routes.config";
 import { UsersRoutes } from "./server/users/users.routes.config";
-import { CalendarRoutes } from "./server/calendars/calendar.routes.config";
+import CalendarRoutes from "./server/calendars/routes/calendar.router";
 import { PaymentOverrideRoutes } from "./server/payment_overrides/payment_override.routes.config";
 import { CancellationRoutes } from "./server/cancellations/cancellation.routes.config";
 import { CompanyRoutes } from "./server/companies/company.routes.config";
@@ -31,7 +31,7 @@ const loggerOptions: expressWinston.LoggerOptions = {
     ),
 };
 
-if (!process.env.DEBUG) {
+if (process.env.DEBUG) {
     loggerOptions.meta = true;
 }
 
@@ -42,6 +42,10 @@ routes.push(new CalendarRoutes(app));
 routes.push(new PaymentOverrideRoutes(app));
 routes.push(new CancellationRoutes(app));
 routes.push(new CompanyRoutes(app));
+
+routes.forEach((route) => {
+    route.configureRoutes();
+});
 
 const runningMessage = `Server running at http://localhost:${port}`;
 app.get("/", (req: express.Request, res: express.Response) => {

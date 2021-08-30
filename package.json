@@ -34,9 +34,10 @@
     "winston": "^3.3.3"
   },
   "scripts": {
-    "start": "tsc && nodemon --watch ./ --ext ts --exec ts-node --ignore '*.spec.ts' --delay 1 app.ts --unhandled-rejections=strict ./dist/app.js",
+    "start": "set APP=dev&&tsc && nodemon --watch ./ --ext ts --exec ts-node --ignore '*.spec.ts' --delay 1 app.ts --unhandled-rejections=strict ./dist/app.js",
     "debug": "export DEBUG=* && npm run start",
-    "test": "mocha --exit"
+    "test": "set APP=test&& mocha",
+    "test-w":"set APP=test&& mocha --watch"
   },
   "devDependencies": {
     "@netflix/tslint-config": "^1.0.1",
