@@ -2,7 +2,7 @@ import { CreateCompanyDto } from "../dtos/create.company.dto";
 import { PatchCompanyDto } from "../dtos/patch.company.dto";
 import { PutCompanyDto } from "../dtos/put.company.dto";
 import debug from "debug";
-import { query } from "../../common/services/postgres";
+import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
 
 const log: debug.IDebugger = debug("app:company-dao");

@@ -3,7 +3,7 @@ import { PatchUserDto } from "../dto/patch.user.dto";
 import { PutUserDto } from "../dto/put.user.dto";
 import shortid from "shortid";
 import debug from "debug";
-import { query } from "../../common/services/postgres";
+import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
 
 const log: debug.IDebugger = debug(`app:user-dao`);

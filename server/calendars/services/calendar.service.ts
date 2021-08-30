@@ -6,29 +6,30 @@ import CalendarDao from "../daos/calendar.dao";
 import { CreateCalendarDto } from "../dtos/create.calendar.dto";
 
 class CalendarService implements CRUD {
+    private calendarDao: CalendarDao = new CalendarDao();
     async create(resource: CreateCalendarDto) {
-        return CalendarDao.addCalendar(resource);
+        return this.calendarDao.addCalendar(resource);
     }
 
     async deleteById(id: string) {
-        return CalendarDao.removeCalendarById(id);
+        return this.calendarDao.removeCalendarById(id);
     }
 
     async list(limit: number, page: number) {
-        return CalendarDao.getCalendars();
+        return this.calendarDao.getCalendars();
     }
 
     async patchById(id: string, resource: PatchCalendarDto) {
-        return CalendarDao.patchCalendarById(id, resource);
+        return this.calendarDao.patchCalendarById(id, resource);
     }
 
     async putById(id: string, resource: PutCalendarDto) {
-        return CalendarDao.putCalendarById(id, resource);
+        return this.calendarDao.putCalendarById(id, resource);
     }
 
     async readById(id: string) {
-        return CalendarDao.getCalendarById(id);
+        return this.calendarDao.getCalendarById(id);
     }
 }
 
-export default new CalendarService();
+export default CalendarService;

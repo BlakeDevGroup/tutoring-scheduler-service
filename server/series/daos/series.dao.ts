@@ -2,7 +2,7 @@ import { CreateSeriesDto } from "../dtos/create.series.dto";
 import { PatchSeriesDto } from "../dtos/patch.series.dto";
 import { PutSeriesDto } from "../dtos/put.series.dto";
 import debug from "debug";
-import { query } from "../../common/services/postgres";
+import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
 
 const log: debug.IDebugger = debug(`app:series-dao`);

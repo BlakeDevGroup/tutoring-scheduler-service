@@ -23,13 +23,14 @@ const EMPTY_EVENTS_LIST = {
     rows: [],
 };
 
-const EVENT_STRING: string = `INSERT INTO "ts.events" (date_start, date_end, title, all_day, calendar_id) VALUES ($1, $2, $3, $4, $5)`;
-const queryStub = sinon.stub();
+const EVENT_STRING: string =
+    'INSERT INTO "ts.events" (date_start, date_end, title, all_day, calendar_id, user_id) VALUES ($1, $2, $3, $4, $5, $6)';
+let queryStub = sinon.stub();
 queryStub.returns(CREATED_EVENTS_LIST);
 
 describe("EventDao", function () {
     let EventDao = proxyquire("./event.dao", {
-        "../../common/services/postgres": { query: queryStub },
+        "../../common/services/postgres.service": { query: queryStub },
     }).default;
     let sandbox: SinonSandbox;
     const eventDao = new EventDao();
@@ -49,12 +50,12 @@ describe("EventDao", function () {
     describe("method:addEvent", () => {
         it("should run with correct parameters and run query only once", async () => {
             await eventDao.addEvent({
-                dateEnd: CREATED_EVENTS_LIST.rows[0].date_end,
-                dateStart: CREATED_EVENTS_LIST.rows[0].date_start,
+                date_end: CREATED_EVENTS_LIST.rows[0].date_end,
+                date_start: CREATED_EVENTS_LIST.rows[0].date_start,
                 title: CREATED_EVENTS_LIST.rows[0].title,
-                allDay: CREATED_EVENTS_LIST.rows[0].all_day,
-                calendarId: CREATED_EVENTS_LIST.rows[0].calendar_id,
-                userId: CREATED_EVENTS_LIST.rows[0].user_id,
+                all_day: CREATED_EVENTS_LIST.rows[0].all_day,
+                calendar_id: CREATED_EVENTS_LIST.rows[0].calendar_id,
+                user_id: CREATED_EVENTS_LIST.rows[0].user_id,
             });
 
             expect(queryStub).calledWith(EVENT_STRING, [
@@ -165,12 +166,12 @@ describe("EventDao", function () {
             queryStub.returns(EMPTY_EVENTS_LIST);
 
             await eventDao.putEventById(eventId, {
-                dateStart: CREATED_EVENTS_LIST.rows[0].date_start,
-                dateEnd: CREATED_EVENTS_LIST.rows[0].date_end,
+                date_start: CREATED_EVENTS_LIST.rows[0].date_start,
+                date_end: CREATED_EVENTS_LIST.rows[0].date_end,
                 title: CREATED_EVENTS_LIST.rows[0].title,
-                allDay: CREATED_EVENTS_LIST.rows[0].all_day,
-                userId: CREATED_EVENTS_LIST.rows[0].user_id,
-                calendarId: CREATED_EVENTS_LIST.rows[0].calendar_id,
+                all_day: CREATED_EVENTS_LIST.rows[0].all_day,
+                user_id: CREATED_EVENTS_LIST.rows[0].user_id,
+                calendar_id: CREATED_EVENTS_LIST.rows[0].calendar_id,
             });
 
             expect(queryStub).calledWith(sql, event);
@@ -198,12 +199,12 @@ describe("EventDao", function () {
             queryStub.returns(EMPTY_EVENTS_LIST);
 
             await eventDao.patchEventById(eventId, {
-                dateStart: CREATED_EVENTS_LIST.rows[0].date_start,
-                dateEnd: CREATED_EVENTS_LIST.rows[0].date_end,
+                date_start: CREATED_EVENTS_LIST.rows[0].date_start,
+                date_end: CREATED_EVENTS_LIST.rows[0].date_end,
                 title: CREATED_EVENTS_LIST.rows[0].title,
-                allDay: CREATED_EVENTS_LIST.rows[0].all_day,
-                userId: CREATED_EVENTS_LIST.rows[0].user_id,
-                calendarId: CREATED_EVENTS_LIST.rows[0].calendar_id,
+                all_day: CREATED_EVENTS_LIST.rows[0].all_day,
+                user_id: CREATED_EVENTS_LIST.rows[0].user_id,
+                calendar_id: CREATED_EVENTS_LIST.rows[0].calendar_id,
             });
 
             expect(queryStub).calledWith(sql, event);

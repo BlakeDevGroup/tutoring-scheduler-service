@@ -4,17 +4,22 @@ import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
 import EventService from "./event.service";
 import EventDao from "../daos/event.dao";
+import { CreateEventDto } from "../dtos/create.event.dto";
 
 chai.use(sinonChai);
-const RESOLVED_STATEMENT = "resolved";
+const RESOLVED = {
+    success: true,
+    message: "PROCESS RESOLVED",
+    statusCode: 200,
+};
 const EVENT_ID: string = "1";
 const EVENT_ARG = {
-    dateStart: "08-25-2021",
-    dateEnd: "08-26-2021",
+    date_start: "08-25-2021",
+    date_end: "08-26-2021",
     title: "Example Argument",
-    allDay: true,
-    calendarId: 1,
-    userId: 1,
+    all_day: true,
+    calendar_id: 1,
+    user_id: 1,
 };
 describe("EventService", () => {
     let eventDaoStub: SinonStub = sinon.stub();
@@ -30,13 +35,18 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "addEvent")
-                .resolves(RESOLVED_STATEMENT);
-
-            const result = await eventService.create(EVENT_ARG);
+                .resolves(RESOLVED);
+            type EventResponse = {
+                message: string;
+                success: boolean;
+                data?: CreateEventDto;
+                error?: Error;
+            };
+            const result: EventResponse = await eventService.create(EVENT_ARG);
 
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith(EVENT_ARG);
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 
@@ -44,13 +54,13 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "removeEventById")
-                .resolves(RESOLVED_STATEMENT);
+                .resolves(RESOLVED);
 
             const result = await eventService.deleteById(EVENT_ID);
 
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith(EVENT_ID);
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 
@@ -58,13 +68,13 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "getEvents")
-                .resolves(RESOLVED_STATEMENT);
+                .resolves(RESOLVED);
 
             const result = await eventService.list(100, 1);
 
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith();
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 
@@ -72,12 +82,12 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "patchEventById")
-                .resolves(RESOLVED_STATEMENT);
+                .resolves(RESOLVED);
 
             const result = await eventService.patchById(EVENT_ID, EVENT_ARG);
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith();
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 
@@ -85,12 +95,12 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "putEventById")
-                .resolves(RESOLVED_STATEMENT);
+                .resolves(RESOLVED);
 
             const result = await eventService.putById(EVENT_ID, EVENT_ARG);
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith();
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 
@@ -98,13 +108,13 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "getEventById")
-                .resolves(RESOLVED_STATEMENT);
+                .resolves(RESOLVED);
 
             const result = await eventService.readById(EVENT_ID);
 
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith(EVENT_ID);
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 
@@ -112,7 +122,7 @@ describe("EventService", () => {
         it("should run once with correct parameters and returns correctly", async () => {
             eventDaoStub = sinon
                 .stub(EventDao.prototype, "getEventsByCalendarId")
-                .resolves(RESOLVED_STATEMENT);
+                .resolves(RESOLVED);
 
             const result = await eventService.listByCalendarId(
                 parseInt(EVENT_ID),
@@ -122,7 +132,7 @@ describe("EventService", () => {
 
             expect(eventDaoStub).calledOnce;
             expect(eventDaoStub).calledWith(parseInt(EVENT_ID));
-            expect(result).to.equal(RESOLVED_STATEMENT);
+            expect(result).to.equal(RESOLVED);
         });
     });
 });

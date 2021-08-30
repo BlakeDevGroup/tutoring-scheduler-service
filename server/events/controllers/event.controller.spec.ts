@@ -1,12 +1,9 @@
-import sinon, { SinonSandbox, SinonStub, spy } from "sinon";
-import chai, { expect, should } from "chai";
-import sinonChai from "sinon-chai";
-import proxyquire from "proxyquire";
+import sinon from "sinon";
+import { expect } from "chai";
 import EventService from "../services/event.service";
-import eventController from "./event.controller";
-import express from "express";
+import EventController from "./event.controller";
 import { createRequest, createResponse } from "node-mocks-http";
-import { http } from "winston";
+import EventsController from "./event.controller";
 
 const EVENT_DATA = [
     {
@@ -34,13 +31,21 @@ const EVENT_DATA = [
         calendar_id: 1,
     },
 ];
-const FAIL_RESULT = "REQUEST FAILED";
+const FAILED = { success: false, message: "PROCESS FAILED", statusCode: 400 };
+const RESOLVED = {
+    success: true,
+    message: "PROCESS RESOLVED",
+    statusCode: 200,
+};
 const CALENDAR_ID = 1,
     EVENT_ID = 1;
 let eventServiceStub = sinon.stub();
+let eventController: EventsController;
 
 describe("EventController", () => {
-    beforeEach(() => {});
+    beforeEach(() => {
+        eventController = new EventController();
+    });
     afterEach(() => {
         sinon.restore();
         eventServiceStub.reset();
@@ -49,11 +54,10 @@ describe("EventController", () => {
         it("should return all events and status 200", async () => {
             eventServiceStub = sinon
                 .stub(EventService.prototype, "listByCalendarId")
-                .resolves(EVENT_DATA);
-
+                .resolves(RESOLVED);
             let req = createRequest({
                 body: {
-                    calendarId: CALENDAR_ID,
+                    calendar_id: CALENDAR_ID,
                     limit: 100,
                     page: 1,
                 },
@@ -64,7 +68,7 @@ describe("EventController", () => {
 
             expect(eventServiceStub).calledOnce;
             expect(eventServiceStub).calledWith(CALENDAR_ID, 100, 1);
-            expect(res._getData()).to.equal(EVENT_DATA);
+            expect(res._getData()).to.equal(RESOLVED);
             expect(res.statusCode).to.equal(200);
         });
     });
@@ -73,11 +77,11 @@ describe("EventController", () => {
         it("should return event with status code 200", async () => {
             eventServiceStub = sinon
                 .stub(EventService.prototype, "readById")
-                .resolves(EVENT_DATA[0]);
+                .resolves(RESOLVED);
 
             let req = createRequest({
                 body: {
-                    eventId: 1,
+                    event_id: 1,
                 },
             });
 
@@ -87,15 +91,16 @@ describe("EventController", () => {
 
             expect(eventServiceStub).calledOnce;
             expect(eventServiceStub).calledWith(1);
-            expect(res._getData()).to.equal(EVENT_DATA[0]);
+            expect(res._getData()).to.equal(RESOLVED);
             expect(res.statusCode).to.equal(200);
         });
     });
 
     describe("method:createEvent", () => {
-        it("should return success message and status code 200", async () => {
-            eventServiceStub = sinon.stub(EventService.prototype, "create");
-
+        it("should return success message", async () => {
+            eventServiceStub = sinon
+                .stub(EventService.prototype, "create")
+                .resolves(RESOLVED);
             let req = createRequest({
                 body: {},
             });
@@ -105,18 +110,17 @@ describe("EventController", () => {
 
             expect(eventServiceStub).calledOnce;
             expect(eventServiceStub).calledWith({});
-            expect(res._getData()).to.include.keys("success");
-            expect(res._getData().success).to.equal(
-                "Event Successfully Created"
-            );
+            expect(res._getData()).to.equal(RESOLVED);
             expect(res.statusCode).to.equal(200);
         });
     });
 
     describe("method:patch", () => {
         it("should return success message and status code 200", async () => {
-            eventServiceStub = sinon.stub(EventService.prototype, "patchById");
-            const body = { eventId: 1 };
+            eventServiceStub = sinon
+                .stub(EventService.prototype, "patchById")
+                .resolves(RESOLVED);
+            const body = { event_id: 1 };
             let req = createRequest({
                 body: body,
             });
@@ -125,19 +129,18 @@ describe("EventController", () => {
             await eventController.patch(req, res);
 
             expect(eventServiceStub).calledOnce;
-            expect(eventServiceStub).calledWith(body.eventId, body);
-            expect(res._getData()).to.include.keys("success");
-            expect(res._getData().success).to.equal(
-                `Event id:${req.body.eventId} successfully Patched`
-            );
-            expect(res.statusCode).to.equal(204);
+            expect(eventServiceStub).calledWith(body.event_id, body);
+            expect(res._getData()).to.equal(RESOLVED);
+            expect(res.statusCode).to.equal(200);
         });
     });
 
     describe("method:put", () => {
         it("should return success message and status code 200", async () => {
-            eventServiceStub = sinon.stub(EventService.prototype, "putById");
-            const body = { eventId: 1 };
+            eventServiceStub = sinon
+                .stub(EventService.prototype, "putById")
+                .resolves(RESOLVED);
+            const body = { event_id: 1 };
             let req = createRequest({
                 body: body,
             });
@@ -146,22 +149,21 @@ describe("EventController", () => {
             await eventController.put(req, res);
 
             expect(eventServiceStub).calledOnce;
-            expect(eventServiceStub).calledWith(body.eventId, body);
-            expect(res._getData()).to.include.keys("success");
-            expect(res._getData().success).to.equal(
-                `Event id:${req.body.eventId} successfully Updated`
-            );
-            expect(res.statusCode).to.equal(204);
+            expect(eventServiceStub).calledWith(body.event_id, body);
+            expect(res._getData()).to.equal(RESOLVED);
+            expect(res.statusCode).to.equal(200);
         });
     });
 
     describe("method:removeEvent", () => {
         it("should return success message and status code 200", async () => {
-            eventServiceStub = sinon.stub(EventService.prototype, "deleteById");
+            eventServiceStub = sinon
+                .stub(EventService.prototype, "deleteById")
+                .resolves(RESOLVED);
 
             let req = createRequest({
                 body: {
-                    eventId: EVENT_ID,
+                    event_id: EVENT_ID,
                 },
             });
             let res = createResponse();
@@ -170,10 +172,8 @@ describe("EventController", () => {
 
             expect(eventServiceStub).calledOnce;
             expect(eventServiceStub).calledWith(EVENT_ID);
-            expect(res._getData()).to.include.keys("success");
-            expect(res._getData().success).to.equal(
-                `Event id:${req.body.eventId} successfully Deleted`
-            );
+            expect(res._getData()).to.equal(RESOLVED);
+            expect(res.statusCode).to.equal(200);
         });
     });
 });
