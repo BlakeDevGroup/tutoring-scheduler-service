@@ -2,7 +2,6 @@ import sinon, { SinonSandbox, spy } from "sinon";
 import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
-import { query } from "express";
 
 chai.use(sinonChai);
 

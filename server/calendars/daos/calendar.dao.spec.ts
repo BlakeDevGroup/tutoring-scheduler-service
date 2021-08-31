@@ -5,7 +5,6 @@ import proxyquire from "proxyquire";
 import CalendarDao from "./calendar.dao";
 import { ServerResponsePayload } from "../../common/services/message/message.service";
 import * as messageService from "../../common/services/message/message.service";
-import { query } from "express";
 chai.use(sinonChai);
 let queryStub = sinon.stub();
 const SUCCESS: ServerResponsePayload = {
