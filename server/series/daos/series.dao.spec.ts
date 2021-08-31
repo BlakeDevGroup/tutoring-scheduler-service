@@ -1,4 +1,4 @@
-import sinon, { SinonSandbox, SinonSpy, SinonStub, spy } from "sinon";
+import sinon, { SinonSpy, SinonStub, SinonSandbox } from "sinon";
 import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
@@ -7,7 +7,6 @@ import { ServerResponsePayload } from "../../common/services/message/message.ser
 import * as messageService from "../../common/services/message/message.service";
 import { query } from "express";
 chai.use(sinonChai);
-sinon.restore();
 const SERIES_DATA = {
     title: "Test Series",
     description: "Test Series description",
@@ -23,14 +22,23 @@ const FAILED_ERROR = new Error("Failed");
 const SERIES_ID = "1";
 
 let queryStub: SinonStub = sinon.stub();
-let spySuccess: SinonSpy = sinon.spy(messageService, "sendSuccess");
-let spyFailure: SinonSpy = sinon.spy(messageService, "sendFailure");
-
-describe.only("SeriesDao", () => {
+let spySuccess: SinonSpy;
+let spyFailure: SinonSpy;
+let sandBox: SinonSandbox;
+describe("SeriesDao", () => {
     let SeriesDao = proxyquire("./series.dao", {
         "../../common/services/postgres.service": { query: queryStub },
     }).default;
     let seriesDao: SeriesDao = new SeriesDao();
+    before(() => {
+        sandBox = sinon.createSandbox();
+        spySuccess = sandBox.spy(messageService, "sendSuccess");
+        spyFailure = sandBox.spy(messageService, "sendFailure");
+    });
+
+    after(() => {
+        sandBox.restore();
+    });
     beforeEach(() => {
         queryStub.resolves(SERIES_RETURN_VALUE);
     });
