@@ -1,8 +1,11 @@
-import sinon, { SinonSandbox, spy } from "sinon";
+import sinon, { SinonSandbox, SinonStub, SinonSpy, spy } from "sinon";
 import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
-
+import { ServerResponsePayload } from "../../common/services/message/message.service";
+import * as messageService from "../../common/services/message/message.service";
+import EventDao from "./event.dao";
+import { query } from "winston";
 chai.use(sinonChai);
 
 const CREATED_EVENTS_LIST = {
@@ -22,23 +25,34 @@ const EMPTY_EVENTS_LIST = {
     rows: [],
 };
 
+const FAILED_ERROR = new Error("Failed Error");
+
 const EVENT_STRING: string =
     'INSERT INTO "ts.events" (date_start, date_end, title, all_day, calendar_id, user_id) VALUES ($1, $2, $3, $4, $5, $6)';
-let queryStub = sinon.stub();
-queryStub.returns(CREATED_EVENTS_LIST);
-
+let queryStub: SinonStub = sinon.stub();
+let spySuccess: SinonSpy;
+let spyFailure: SinonSpy;
+let sandBox: SinonSandbox;
 describe("EventDao", function () {
     let EventDao = proxyquire("./event.dao", {
         "../../common/services/postgres.service": { query: queryStub },
     }).default;
-    let sandbox: SinonSandbox;
-    const eventDao = new EventDao();
+    const eventDao: EventDao = new EventDao();
+    before(() => {
+        sandBox = sinon.createSandbox();
+        spySuccess = sandBox.spy(messageService, "sendSuccess");
+        spyFailure = sandBox.spy(messageService, "sendFailure");
+    });
+    after(() => {
+        sandBox.restore();
+    });
     beforeEach(() => {
-        sandbox = sinon.createSandbox();
+        queryStub.resolves(CREATED_EVENTS_LIST);
     });
     afterEach(() => {
-        sandbox.restore();
         queryStub.reset();
+        spySuccess.resetHistory();
+        spyFailure.resetHistory();
     });
     describe("property:tableName", function () {
         it("should equal ts.events", function () {
@@ -90,7 +104,7 @@ describe("EventDao", function () {
     describe("method:getEventsByCalendarId", () => {
         it("should retrieve event specified by calendar_id", async () => {
             const sql = `SELECT * FROM "ts.events" WHERE calendar_id = $1`;
-            const calendarId = 1;
+            const calendarId = "1";
             queryStub.withArgs(sql, [calendarId]).returns(CREATED_EVENTS_LIST);
 
             await eventDao.getEventsByCalendarId(calendarId);
@@ -104,7 +118,7 @@ describe("EventDao", function () {
 
         it("should retrieve empty array because no event with associated calendar_id", async () => {
             const sql = `SELECT * FROM "ts.events" WHERE calendar_id = $1`;
-            const calendarId = 2;
+            const calendarId = "2";
             queryStub.withArgs(sql, [1]).returns(CREATED_EVENTS_LIST);
             queryStub.withArgs(sql, [calendarId]).returns(EMPTY_EVENTS_LIST);
 
@@ -121,21 +135,19 @@ describe("EventDao", function () {
     describe("method:getEventById", () => {
         it("should retreive event by specified event_id", async () => {
             const sql = `SELECT * FROM "ts.events" WHERE event_id = $1`;
-            const eventId = 1;
-            queryStub.withArgs(sql, [1]).returns(CREATED_EVENTS_LIST);
+            const eventId = "1";
+            queryStub.withArgs(sql, [eventId]);
 
             await eventDao.getEventById(eventId);
 
             expect(queryStub).calledWith(sql, [eventId]);
 
             expect(queryStub).calledOnce;
-
-            expect(queryStub).returned(CREATED_EVENTS_LIST);
         });
 
         it("should retreive empty array as no event with event_id", async () => {
             const sql = `SELECT * FROM "ts.events" WHERE event_id = $1`;
-            const eventId = 2;
+            const eventId = "2";
             queryStub.withArgs(sql, [1]).returns(CREATED_EVENTS_LIST);
             queryStub.withArgs(sql, [2]).returns(EMPTY_EVENTS_LIST);
             await eventDao.getEventById(eventId);
@@ -143,15 +155,13 @@ describe("EventDao", function () {
             expect(queryStub).calledWith(sql, [eventId]);
 
             expect(queryStub).calledOnce;
-
-            expect(queryStub).returned(EMPTY_EVENTS_LIST);
         });
     });
 
     describe("method:putEventById", () => {
         it("should put change to event and return empty array", async () => {
             const sql = `UPDATE "ts.events" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6 WHERE calendar_id = $7 and event_id = $1`;
-            const eventId = 1;
+            const eventId = "1";
             const event = [
                 eventId,
                 CREATED_EVENTS_LIST.rows[0].date_start,
@@ -184,7 +194,7 @@ describe("EventDao", function () {
     describe("method:patchEventById", () => {
         it("should patch change to event and return empty array", async () => {
             const sql = `UPDATE "ts.events" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6 WHERE calendar_id = $7 and event_id = $1`;
-            const eventId = 1;
+            const eventId = "1";
             const event = [
                 eventId,
                 CREATED_EVENTS_LIST.rows[0].date_start,
@@ -217,7 +227,7 @@ describe("EventDao", function () {
     describe("method:removeEventById", () => {
         it("should remove event and return empty array", async () => {
             const sql = `DELETE FROM "ts.events" WHERE event_id = $1`;
-            const eventId = 1;
+            const eventId = "1";
 
             queryStub.returns(EMPTY_EVENTS_LIST);
 
@@ -228,6 +238,50 @@ describe("EventDao", function () {
             expect(queryStub).calledOnce;
 
             expect(queryStub).returned(EMPTY_EVENTS_LIST);
+        });
+    });
+
+    describe("get event by event_id and calendar_id", () => {
+        const EVENT_ID = "1";
+        const CALENDAR_ID = "1";
+        const sql = `SELECT * FROM "ts.events" WHERE event_id = $1 and calendar_id = $2`;
+
+        it("should sendFailure and status 404 if event_id does not exist on calendar_id", async () => {
+            queryStub.resolves({ rows: [] });
+            await eventDao.getEventByCalendarId(EVENT_ID, CALENDAR_ID);
+
+            expect(queryStub).calledOnce;
+            expect(queryStub).calledWith(sql, [EVENT_ID, CALENDAR_ID]);
+
+            expect(spyFailure).calledOnce;
+
+            expect(spyFailure.args[0][0]).to.equal(
+                `Event with id: ${EVENT_ID} does not exist on calendar with id: ${CALENDAR_ID}`
+            );
+
+            expect(spyFailure.args[0][2]).to.equal(404);
+        });
+
+        it("should handle error, sendFailure and status 500", async () => {
+            queryStub.throws(FAILED_ERROR);
+            await eventDao.getEventByCalendarId(EVENT_ID, CALENDAR_ID);
+
+            expect(spyFailure).calledOnce;
+            expect(spyFailure).calledWith(
+                FAILED_ERROR.message,
+                FAILED_ERROR,
+                500
+            );
+        });
+
+        it("should call sensuccess with proper args and status 200", async () => {
+            await eventDao.getEventByCalendarId(EVENT_ID, CALENDAR_ID);
+
+            expect(spySuccess).calledOnce;
+            expect(spySuccess).calledWith(
+                "Successfully retrieved event",
+                CREATED_EVENTS_LIST.rows[0]
+            );
         });
     });
 });

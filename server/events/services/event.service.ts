@@ -31,8 +31,12 @@ class EventService implements CRUD {
         return this.eventDao.getEventById(id);
     }
 
-    async listByCalendarId(calendarId: number, limit: number, page: number) {
+    async listByCalendarId(calendarId: string, limit: number, page: number) {
         return this.eventDao.getEventsByCalendarId(calendarId);
+    }
+
+    async readByIdAndCalendarId(eventId: string, calendarId: string) {
+        return this.eventDao.getEventByCalendarId(eventId, calendarId);
     }
 }
 

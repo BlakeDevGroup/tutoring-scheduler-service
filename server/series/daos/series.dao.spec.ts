@@ -1,4 +1,4 @@
-import sinon, { SinonSpy, SinonStub, SinonSandbox } from "sinon";
+import sinon, { SinonSpy, SinonStub, SinonSandbox, spy } from "sinon";
 import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
@@ -248,7 +248,7 @@ describe("SeriesDao", () => {
             expect(spySuccess).calledWith(
                 "Successfully removed series",
                 [],
-                204
+                200
             );
         });
 
@@ -262,6 +262,46 @@ describe("SeriesDao", () => {
                 FAILED_ERROR.message,
                 FAILED_ERROR,
                 500
+            );
+        });
+    });
+
+    describe("get series by calendar_id", () => {
+        const CALENDAR_ID = "1";
+        const sql = `SELECT * FROM "ts.series" WHERE series_id = $1 and calendar_id = $2`;
+        it("should send failure and status 404 if series does not exist on calendar_id", async () => {
+            const ERROR_MESSAGE = `Series with id: ${SERIES_ID} does not exist on calendar with id: ${CALENDAR_ID}`;
+            queryStub.resolves({ rows: [] });
+
+            await seriesDao.getSeriesByIdAndCalendarId(SERIES_ID, CALENDAR_ID);
+
+            expect(queryStub).calledOnce;
+            expect(queryStub).calledWith(sql, [SERIES_ID, CALENDAR_ID]);
+
+            expect(spyFailure).calledOnce;
+            expect(spyFailure.args[0][0]).to.equal(ERROR_MESSAGE);
+            expect(spyFailure.args[0][2]).to.equal(404);
+        });
+
+        it("should handle error send failure with status 500", async () => {
+            queryStub.throws(FAILED_ERROR);
+            await seriesDao.getSeriesByIdAndCalendarId(SERIES_ID, CALENDAR_ID);
+
+            expect(spyFailure).calledOnce;
+            expect(spyFailure).calledWith(
+                FAILED_ERROR.message,
+                FAILED_ERROR,
+                500
+            );
+        });
+
+        it("should send success with status 200", async () => {
+            await seriesDao.getSeriesByIdAndCalendarId(SERIES_ID, CALENDAR_ID);
+
+            expect(spySuccess).calledOnce;
+            expect(spySuccess).calledWith(
+                "Successfully retrieved series",
+                SERIES_RETURN_VALUE.rows[0]
             );
         });
     });

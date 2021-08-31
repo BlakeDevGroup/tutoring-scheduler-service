@@ -48,7 +48,7 @@ export default class EventDao {
     }
 
     async getEventsByCalendarId(
-        calendarId: number
+        calendarId: string
     ): Promise<ServerResponsePayload> {
         const sql = `SELECT * FROM "${this.tableName}" WHERE calendar_id = $1`;
 
@@ -57,7 +57,30 @@ export default class EventDao {
 
             return sendSuccess("Successfully retrieved events", rows);
         } catch (e) {
-            return sendFailure(e.message, e);
+            return sendFailure(e.message, e, 500);
+        }
+    }
+
+    async getEventByCalendarId(
+        eventId: string,
+        calendarId: string
+    ): Promise<ServerResponsePayload> {
+        const sql = `SELECT * FROM "ts.events" WHERE event_id = $1 and calendar_id = $2`;
+        try {
+            const { rows } = await query(sql, [eventId, calendarId]);
+
+            if (rows.length > 0) {
+                return sendSuccess("Successfully retrieved event", rows[0]);
+            } else {
+                const ERROR_MESSAGE = `Event with id: ${eventId} does not exist on calendar with id: ${calendarId}`;
+                return sendFailure(
+                    ERROR_MESSAGE,
+                    new Error(ERROR_MESSAGE),
+                    404
+                );
+            }
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 

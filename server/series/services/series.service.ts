@@ -29,6 +29,10 @@ class SeriesService implements CRUD {
     async readById(id: string) {
         return this.seriesDao.getSeriesById(id);
     }
+
+    async readByIdAndCalendarId(seriesId: string, calendarId: string) {
+        return this.seriesDao.getSeriesByIdAndCalendarId(seriesId, calendarId);
+    }
 }
 
-export default new SeriesService();
+export default SeriesService;

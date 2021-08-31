@@ -72,6 +72,26 @@ export default class SeriesDao {
         }
     }
 
+    async getSeriesByIdAndCalendarId(seriesId: string, calendarId: string) {
+        const sql = `SELECT * FROM "${this.tableName}" WHERE series_id = $1 and calendar_id = $2`;
+        try {
+            const { rows } = await query(sql, [seriesId, calendarId]);
+
+            if (rows.length > 0) {
+                return sendSuccess("Successfully retrieved series", rows[0]);
+            } else {
+                const ERROR_MESSAGE = `Series with id: ${seriesId} does not exist on calendar with id: ${calendarId}`;
+                return sendFailure(
+                    ERROR_MESSAGE,
+                    new Error(ERROR_MESSAGE),
+                    404
+                );
+            }
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
+    }
+
     async putSeriesById(
         seriesId: string,
         series: PutSeriesDto
@@ -131,7 +151,7 @@ export default class SeriesDao {
         try {
             await query(sql, [seriesId]);
 
-            return sendSuccess("Successfully removed series", [], 204);
+            return sendSuccess("Successfully removed series", [], 200);
         } catch (e) {
             return sendFailure(e.message, e, 500);
         }

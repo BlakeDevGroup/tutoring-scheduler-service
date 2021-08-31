@@ -84,7 +84,7 @@ describe("EventRouter", () => {
         it("should send event when event_id exists on calendar_id", async () => {
             const response = await request(app)
                 .get("/events/35")
-                .send({ calendarId: 1 });
+                .send({ calendar_id: 1 });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body).to.be.an("object");
@@ -113,7 +113,7 @@ describe("EventRouter", () => {
             const EVENT_ID = 9999;
             const response = await request(app)
                 .get(`/events/${EVENT_ID}`)
-                .send({ calendarId: 1 });
+                .send({ calendar_id: 1 });
 
             expect(response.statusCode).to.equal(404);
             expect(response.body)
@@ -121,7 +121,7 @@ describe("EventRouter", () => {
                 .and.includes.keys("success", "message", "error", "statusCode");
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `No event found with id: ${EVENT_ID}`
+                `Event with id: ${EVENT_ID} does not exist on calendar with id: 1`
             );
         });
     });
@@ -303,7 +303,7 @@ describe("EventRouter", () => {
             );
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `No event found with id: 9999`
+                `Event with id: 9999 does not exist on calendar with id: 1`
             );
         });
         it("should throw error when date_start is not a valid JS Date string", async () => {
@@ -473,6 +473,25 @@ describe("EventRouter", () => {
             expect(response.body.data).to.deep.equal([]);
             expect(response.body.message).to.equal(
                 "Successfully removed event"
+            );
+        });
+    });
+
+    describe("GET /events/:event_id", () => {
+        it("should return error when event_id does not exist on calendar_id", async () => {
+            const EVENT_ID = 35;
+            const response = await request(app)
+                .get(`/events/${EVENT_ID}`)
+                .send({ calendar_id: 2 });
+
+            expect(response.statusCode).to.equal(404);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Event with id: ${EVENT_ID} does not exist on calendar with id: 2`
             );
         });
     });

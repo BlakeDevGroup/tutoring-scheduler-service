@@ -34,7 +34,10 @@ class EventMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const event = await this.eventService.readById(req.params.event_id);
+        const event = await this.eventService.readByIdAndCalendarId(
+            req.params.event_id,
+            req.body.calendar_id
+        );
 
         if (event.success) {
             next();

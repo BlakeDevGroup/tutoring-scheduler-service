@@ -146,30 +146,33 @@ describe("EventMiddleware", () => {
         });
     });
 
-    describe("method:validateEventExists", () => {
+    describe("should validate if event exists for given calendar_id", () => {
         let eventStub: SinonStub;
         beforeEach(() => {
-            eventStub = sinon.stub(EventService.prototype, "readById");
+            eventStub = sinon.stub(
+                EventService.prototype,
+                "readByIdAndCalendarId"
+            );
         });
-        it("should call next() if eventId exists in event collection", async () => {
+        it("should call next() if sucess", async () => {
             eventStub.resolves(RESOLVED);
             const params = { event_id: 1 };
 
-            let req = createRequest({ params });
+            let req = createRequest({ params, body: { calendar_id: 1 } });
             let res = createResponse();
 
             await eventMiddleware.validateEventExists(req, res, next);
 
             expect(eventStub).to.have.been.calledOnce;
-            expect(eventStub).to.have.been.calledWith(params.event_id);
+            expect(eventStub).to.have.been.calledWith(params.event_id, 1);
             expect(next).to.have.been.calledOnce;
             expect(res.statusCode).to.equal(200);
         });
 
-        it("should throw error if event is not found", async () => {
+        it("should throw error if success == false", async () => {
             eventStub.resolves(FAILED);
 
-            const params = { event_id: 1 };
+            const params = { event_id: 1, calendar_id: 1 };
             let req = createRequest({ params });
             let res = createResponse();
 
@@ -249,5 +252,9 @@ describe("EventMiddleware", () => {
 
             expect(result).to.equal(false);
         });
+    });
+
+    describe("validate event exists on calendar_id", () => {
+        it("should return 404 if event_id does not exist on calendar_id", () => {});
     });
 });
