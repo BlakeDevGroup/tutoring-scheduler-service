@@ -4,129 +4,156 @@ import { PutSeriesDto } from "../dtos/put.series.dto";
 import debug from "debug";
 import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
+import {
+    sendFailure,
+    sendSuccess,
+    ServerResponsePayload,
+} from "../../common/services/message/message.service";
 
 const log: debug.IDebugger = debug(`app:series-dao`);
 
-class SeriesDao {
+export default class SeriesDao {
     private tableName = "ts.series";
 
     constructor() {
         log("Created new instance of SeriesDao");
     }
 
-    async addSeries(series: CreateSeriesDto): Promise<Query> {
-        const sql = `
-            INSERT INTO "${this.tableName}" (title, description, recurrence, start, end, calendar_id)
-            VALUES ($1, $2, $3, $4, $5, 1)
-        `;
+    async addSeries(series: CreateSeriesDto): Promise<ServerResponsePayload> {
+        const sql = `INSERT INTO "${this.tableName}" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
         try {
-            const { rows } = await query(sql, [
+            await query(sql, [
                 series.title,
                 series.description,
-                series.recurrence,
-                series.start,
-                series.end,
-                series.calendarId,
+                series.calendar_id,
+                series.start_time,
+                series.end_time,
+                series.start_recur,
+                series.end_recur,
+                series.days_of_week,
             ]);
 
-            return rows[0];
-        } catch (error) {
-            return error;
+            return sendSuccess("Successfully created series", [], 201);
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 
-    async getSeries(): Promise<Query> {
-        const sql = `
-            SELECT * FROM "${this.tableName}"
-        `;
+    async getSeries(): Promise<ServerResponsePayload> {
+        const sql = `SELECT * FROM "${this.tableName}"`;
 
         try {
             const { rows } = await query(sql, []);
 
-            return rows;
-        } catch (error) {
-            return error;
+            return sendSuccess("Successfully retrieved all series", rows);
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 
-    async getSeriesById(seriesId: string): Promise<Query> {
-        const sql = `
-            SELECT * FROM "${this.tableName}"
-            WHERE series_id = $1
-        `;
+    async getSeriesById(seriesId: string): Promise<ServerResponsePayload> {
+        const sql = `SELECT * FROM "${this.tableName}" WHERE series_id = $1`;
+
         try {
             const { rows } = await query(sql, [seriesId]);
 
-            return rows[0];
-        } catch (error) {
-            return error;
+            if (rows.length > 0) {
+                return sendSuccess("Successfully retrieved series", rows[0]);
+            } else {
+                const ERROR_MESSAGE = `No series found with id: ${seriesId}`;
+                return sendFailure(
+                    ERROR_MESSAGE,
+                    new Error(ERROR_MESSAGE),
+                    404
+                );
+            }
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
+    }
+
+    async getSeriesByIdAndCalendarId(seriesId: string, calendarId: string) {
+        const sql = `SELECT * FROM "${this.tableName}" WHERE series_id = $1 and calendar_id = $2`;
+        try {
+            const { rows } = await query(sql, [seriesId, calendarId]);
+
+            if (rows.length > 0) {
+                return sendSuccess("Successfully retrieved series", rows[0]);
+            } else {
+                const ERROR_MESSAGE = `Series with id: ${seriesId} does not exist on calendar with id: ${calendarId}`;
+                return sendFailure(
+                    ERROR_MESSAGE,
+                    new Error(ERROR_MESSAGE),
+                    404
+                );
+            }
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 
     async putSeriesById(
         seriesId: string,
         series: PutSeriesDto
-    ): Promise<Query> {
-        const sql = `
-            UPDATE "${this.tableName}"
-            SET title = $2, description = $3, recurrence = $4, start = $5, 
-            end = $6, calendar_id = $7
-            WHERE series_id = $1
-        `;
+    ): Promise<ServerResponsePayload> {
+        const sql = `UPDATE "${this.tableName}" SET title = $2, description = $3, calendar_id = $4, start_time = $5, end_time = $6, start_recur = $7, end_recur = $8, days_of_week = $9 WHERE series_id = $1`;
         try {
-            const { rows } = await query(sql, [
+            await query(sql, [
                 seriesId,
                 series.title,
                 series.description,
-                series.recurrence,
-                series.start,
-                series.end,
-                series.calendarId,
+                series.calendar_id,
+                series.start_time,
+                series.end_time,
+                series.start_recur,
+                series.end_recur,
+                series.days_of_week,
             ]);
 
-            return rows[0];
-        } catch (error) {
-            return error;
+            return sendSuccess(
+                "Successfully updated series",
+                Object.assign(series, { series_id: seriesId })
+            );
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 
     async patchSeriesById(
         seriesId: string,
         series: PatchSeriesDto
-    ): Promise<Query> {
-        const sql = `
-            UPDATE "${this.tableName}"
-            SET title = $2, description = $3, recurrence = $4, start = $5, 
-            end = $6, calendar_id = $7
-            WHERE series_id = $1
-        `;
+    ): Promise<ServerResponsePayload> {
+        const sql = `UPDATE "${this.tableName}" SET title = $2, description = $3, calendar_id = $4, start_time = $5, end_time = $6, start_recur = $7, end_recur = $8, days_of_week = $9 WHERE series_id = $1`;
         try {
-            const { rows } = await query(sql, [
+            await query(sql, [
                 seriesId,
                 series.title,
                 series.description,
-                series.recurrence,
-                series.start,
-                series.end,
-                series.calendarId,
+                series.calendar_id,
+                series.start_time,
+                series.end_time,
+                series.start_recur,
+                series.end_recur,
+                series.days_of_week,
             ]);
 
-            return rows[0];
-        } catch (error) {
-            return error;
+            return sendSuccess(
+                "Successfully updated series",
+                Object.assign(series, { series_id: seriesId })
+            );
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 
     async removeSeriesById(seriesId: string) {
-        const sql = `
-            DELETE FROM "${this.tableName}" WHERE series_id = $1
-        `;
+        const sql = `DELETE FROM "${this.tableName}" WHERE series_id = $1`;
         try {
-            return await query(sql, [seriesId]);
-        } catch (error) {
-            return error;
+            await query(sql, [seriesId]);
+
+            return sendSuccess("Successfully removed series", [], 200);
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
         }
     }
 }
-
-export default new SeriesDao();

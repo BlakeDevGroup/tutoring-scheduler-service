@@ -89,7 +89,7 @@ describe("CalendarRoutes", () => {
         });
 
         it("should retrieve calendar and send status 200", async () => {
-            const response = await request(app).get("/calendars/1");
+            const response = await request(app).get("/calendars/83");
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -108,7 +108,7 @@ describe("CalendarRoutes", () => {
 
     describe("DELETE /calendars/:calendar_id", () => {
         it("should delete calendar with status 200", async () => {
-            const response = await request(app).delete("/calendars/1");
+            const response = await request(app).delete("/calendars/83");
 
             expect(response.statusCode).to.equal(200);
 
@@ -128,7 +128,7 @@ describe("CalendarRoutes", () => {
         it("should send error with status 400 if name is not string", async () => {
             const VALUE = 123;
             const response = await request(app)
-                .put("/calendars/1")
+                .put("/calendars/83")
                 .send({ name: VALUE });
 
             expect(response.statusCode).to.equal(400);
@@ -143,7 +143,7 @@ describe("CalendarRoutes", () => {
 
         it("should update calendar and send status 200", async () => {
             const response = await request(app)
-                .put("/calendars/1")
+                .put("/calendars/83")
                 .send({ name: "Caleb" });
 
             expect(response.statusCode).to.equal(200);
@@ -165,7 +165,7 @@ describe("CalendarRoutes", () => {
         it("should send error with status 400 if name is not string", async () => {
             const VALUE = 123;
             const response = await request(app)
-                .patch("/calendars/1")
+                .patch("/calendars/83")
                 .send({ name: VALUE });
 
             expect(response.statusCode).to.equal(400);
@@ -180,7 +180,7 @@ describe("CalendarRoutes", () => {
 
         it("should update calendar and send status 200", async () => {
             const response = await request(app)
-                .patch("/calendars/1")
+                .patch("/calendars/83")
                 .send({ name: "Caleb" });
 
             expect(response.statusCode).to.equal(200);

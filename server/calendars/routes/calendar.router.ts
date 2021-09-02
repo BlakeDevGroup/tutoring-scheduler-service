@@ -5,7 +5,7 @@ import { Router } from "express";
 import CalendarMiddleware from "../middleware/calendar.middleware";
 
 import EventRouter from "../../events/routes/event.router";
-import { SeriesRouter } from "../../series/series.router.config";
+import SeriesRouter from "../../series/routes/series.router";
 import { body } from "express-validator";
 import BodyValidationMiddleware from "../../common/middleware/body.validation.middleware";
 
