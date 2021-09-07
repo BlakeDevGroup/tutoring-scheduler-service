@@ -20,6 +20,7 @@ const EVENT_ARG = {
     all_day: true,
     calendar_id: 1,
     user_id: 1,
+    description: "Test Description",
 };
 describe("EventService", () => {
     let eventDaoStub: SinonStub = sinon.stub();

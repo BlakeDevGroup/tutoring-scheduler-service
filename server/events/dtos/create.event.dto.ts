@@ -6,4 +6,5 @@ export interface CreateEventDto {
     title: string;
     calendar_id: number;
     user_id: number;
+    description: string;
 }

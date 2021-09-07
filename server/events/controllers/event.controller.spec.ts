@@ -13,6 +13,7 @@ const EVENT_DATA = [
         all_day: true,
         user_id: 1,
         calendar_id: 1,
+        description: "Test Events",
     },
     {
         date_end: "2021-07-29 15:30:00",
@@ -21,6 +22,7 @@ const EVENT_DATA = [
         all_day: true,
         user_id: 1,
         calendar_id: 1,
+        description: "Test Events",
     },
     {
         date_end: "2021-07-29 15:30:00",
@@ -29,6 +31,7 @@ const EVENT_DATA = [
         all_day: true,
         user_id: 1,
         calendar_id: 1,
+        description: "Test Events",
     },
 ];
 const FAILED = { success: false, message: "PROCESS FAILED", statusCode: 400 };
