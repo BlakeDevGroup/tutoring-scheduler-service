@@ -4,7 +4,8 @@ import request from "supertest";
 import express from "express";
 
 import EventRouter from "./event.router";
-
+const CALENDAR_ID = "2";
+const EVENT_ID = "319";
 // import app from "../../../app";
 type Payload = {
     date_end: string;
@@ -12,6 +13,7 @@ type Payload = {
     title: string;
     all_day: Boolean;
     user_id: number;
+    description: string;
 };
 let PAYLOAD: Payload;
 let app: express.Application;
@@ -28,6 +30,7 @@ describe("EventRouter", () => {
             title: "MyEvent",
             all_day: true,
             user_id: 1,
+            description: "Test Event",
         };
     });
     afterEach(() => {
@@ -37,7 +40,7 @@ describe("EventRouter", () => {
         it("should send all events of calendar_id", async () => {
             const response = await request(app)
                 .get("/events")
-                .send({ calendar_id: 1 });
+                .send({ calendar_id: CALENDAR_ID });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -83,8 +86,8 @@ describe("EventRouter", () => {
     describe("GET /events/:id", () => {
         it("should send event when event_id exists on calendar_id", async () => {
             const response = await request(app)
-                .get("/events/35")
-                .send({ calendar_id: 1 });
+                .get(`/events/${EVENT_ID}`)
+                .send({ calendar_id: CALENDAR_ID });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body).to.be.an("object");
@@ -134,7 +137,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendarId: CALENDAR_ID,
                         date_start: VALUE,
                     })
                 );
@@ -157,7 +160,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendarId: CALENDAR_ID,
                         date_end: VALUE,
                     })
                 );
@@ -180,7 +183,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendarId: CALENDAR_ID,
                         date_end: VALUE,
                     })
                 );
@@ -203,7 +206,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendarId: CALENDAR_ID,
                         title: VALUE,
                     })
                 );
@@ -226,7 +229,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendarId: CALENDAR_ID,
                         all_day: VALUE,
                     })
                 );
@@ -248,7 +251,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendarId: CALENDAR_ID,
                         user_id: VALUE,
                     })
                 );
@@ -271,7 +274,7 @@ describe("EventRouter", () => {
                 .post("/events")
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendarId: 1,
+                        calendar_id: CALENDAR_ID,
                     })
                 );
 
@@ -288,7 +291,7 @@ describe("EventRouter", () => {
         });
     });
 
-    describe("/events:id", () => {
+    describe("/events/:id", () => {
         it("should return error object and status code 404 when event is not found", async function () {
             const response = await request(app)
                 .get("/events/9999")
@@ -310,10 +313,10 @@ describe("EventRouter", () => {
             const VALUE = "XXXX";
 
             const response = await request(app)
-                .put("/events/35")
+                .put(`/events/${EVENT_ID}`)
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendar_id: 1,
+                        calendar_id: CALENDAR_ID,
                         date_start: VALUE,
                     })
                 );
@@ -333,10 +336,10 @@ describe("EventRouter", () => {
             const VALUE = "XXXX";
 
             const response = await request(app)
-                .put("/events/35")
+                .put(`/events/${EVENT_ID}`)
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendar_id: 1,
+                        calendar_id: CALENDAR_ID,
                         date_end: VALUE,
                     })
                 );
@@ -356,10 +359,10 @@ describe("EventRouter", () => {
             const VALUE = 123;
 
             const response = await request(app)
-                .put("/events/35")
+                .put(`/events/${EVENT_ID}`)
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendar_id: 1,
+                        calendar_id: CALENDAR_ID,
                         title: VALUE,
                     })
                 );
@@ -379,10 +382,10 @@ describe("EventRouter", () => {
             const VALUE = 123;
 
             const response = await request(app)
-                .put("/events/35")
+                .put(`/events/${EVENT_ID}`)
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendar_id: 1,
+                        calendar_id: CALENDAR_ID,
                         all_day: VALUE,
                     })
                 );
@@ -402,10 +405,10 @@ describe("EventRouter", () => {
             const VALUE = "XXXX";
 
             const response = await request(app)
-                .put("/events/35")
+                .put(`/events/${EVENT_ID}`)
                 .send(
                     Object.assign(PAYLOAD, {
-                        calendar_id: 1,
+                        calendar_id: CALENDAR_ID,
                         user_id: VALUE,
                     })
                 );
@@ -423,8 +426,8 @@ describe("EventRouter", () => {
 
         it("should update an event and send status 200 with event data", async () => {
             const response = await request(app)
-                .put("/events/35")
-                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+                .put(`/events/${EVENT_ID}`)
+                .send(Object.assign(PAYLOAD, { calendar_id: CALENDAR_ID }));
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -433,17 +436,20 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(true);
             expect(response.body.data).to.deep.equal(
-                Object.assign(PAYLOAD, { calendar_id: 1, event_id: "35" })
+                Object.assign(PAYLOAD, {
+                    calendar_id: CALENDAR_ID,
+                    event_id: EVENT_ID,
+                })
             );
             expect(response.body.message).to.equal(
-                `Successfully updated event id: 35`
+                `Successfully updated event id: ${EVENT_ID}`
             );
         });
 
         it("should update an event and send status 200 with event data", async () => {
             const response = await request(app)
-                .patch("/events/35")
-                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+                .patch(`/events/${EVENT_ID}`)
+                .send(Object.assign(PAYLOAD, { calendar_id: CALENDAR_ID }));
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -452,17 +458,20 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(true);
             expect(response.body.data).to.deep.equal(
-                Object.assign(PAYLOAD, { calendar_id: 1, event_id: "35" })
+                Object.assign(PAYLOAD, {
+                    calendar_id: CALENDAR_ID,
+                    event_id: EVENT_ID,
+                })
             );
             expect(response.body.message).to.equal(
-                `Successfully patched event id: 35`
+                `Successfully patched event id: ${EVENT_ID}`
             );
         });
 
         it("should delete an event and send status 200", async () => {
             const response = await request(app)
-                .delete("/events/35")
-                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+                .delete(`/events/${EVENT_ID}`)
+                .send(Object.assign(PAYLOAD, { calendar_id: CALENDAR_ID }));
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)

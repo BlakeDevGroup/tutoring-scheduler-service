@@ -17,6 +17,7 @@ const CREATED_EVENTS_LIST = {
             all_day: true,
             user_id: 1,
             calendar_id: 1,
+            description: "Test Description",
         },
     ],
 };
@@ -61,6 +62,7 @@ describe("EventDao", function () {
     });
 
     describe("method:addEvent", () => {
+        const EVENT_STRING: string = `INSERT INTO "ts.events" (date_start, date_end, title, all_day, calendar_id, user_id, description) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
         it("should run with correct parameters and run query only once", async () => {
             await eventDao.addEvent({
                 date_end: CREATED_EVENTS_LIST.rows[0].date_end,
@@ -69,6 +71,7 @@ describe("EventDao", function () {
                 all_day: CREATED_EVENTS_LIST.rows[0].all_day,
                 calendar_id: CREATED_EVENTS_LIST.rows[0].calendar_id,
                 user_id: CREATED_EVENTS_LIST.rows[0].user_id,
+                description: CREATED_EVENTS_LIST.rows[0].description,
             });
 
             expect(queryStub).calledWith(EVENT_STRING, [
@@ -78,6 +81,7 @@ describe("EventDao", function () {
                 CREATED_EVENTS_LIST.rows[0].all_day,
                 CREATED_EVENTS_LIST.rows[0].calendar_id,
                 CREATED_EVENTS_LIST.rows[0].user_id,
+                CREATED_EVENTS_LIST.rows[0].description,
             ]);
 
             expect(queryStub).calledOnce;
@@ -160,7 +164,7 @@ describe("EventDao", function () {
 
     describe("method:putEventById", () => {
         it("should put change to event and return empty array", async () => {
-            const sql = `UPDATE "ts.events" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6 WHERE calendar_id = $7 and event_id = $1`;
+            const sql = `UPDATE "ts.events" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6, description = $8 WHERE calendar_id = $7 and event_id = $1`;
             const eventId = "1";
             const event = [
                 eventId,
@@ -170,6 +174,7 @@ describe("EventDao", function () {
                 CREATED_EVENTS_LIST.rows[0].all_day,
                 CREATED_EVENTS_LIST.rows[0].user_id,
                 CREATED_EVENTS_LIST.rows[0].calendar_id,
+                CREATED_EVENTS_LIST.rows[0].description,
             ];
 
             queryStub.returns(EMPTY_EVENTS_LIST);
@@ -181,6 +186,7 @@ describe("EventDao", function () {
                 all_day: CREATED_EVENTS_LIST.rows[0].all_day,
                 user_id: CREATED_EVENTS_LIST.rows[0].user_id,
                 calendar_id: CREATED_EVENTS_LIST.rows[0].calendar_id,
+                description: CREATED_EVENTS_LIST.rows[0].description,
             });
 
             expect(queryStub).calledWith(sql, event);
@@ -193,7 +199,7 @@ describe("EventDao", function () {
 
     describe("method:patchEventById", () => {
         it("should patch change to event and return empty array", async () => {
-            const sql = `UPDATE "ts.events" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6 WHERE calendar_id = $7 and event_id = $1`;
+            const sql = `UPDATE "ts.events" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6, description = $8 WHERE calendar_id = $7 and event_id = $1`;
             const eventId = "1";
             const event = [
                 eventId,
@@ -203,6 +209,7 @@ describe("EventDao", function () {
                 CREATED_EVENTS_LIST.rows[0].all_day,
                 CREATED_EVENTS_LIST.rows[0].user_id,
                 CREATED_EVENTS_LIST.rows[0].calendar_id,
+                CREATED_EVENTS_LIST.rows[0].description,
             ];
 
             queryStub.returns(EMPTY_EVENTS_LIST);
@@ -214,6 +221,7 @@ describe("EventDao", function () {
                 all_day: CREATED_EVENTS_LIST.rows[0].all_day,
                 user_id: CREATED_EVENTS_LIST.rows[0].user_id,
                 calendar_id: CREATED_EVENTS_LIST.rows[0].calendar_id,
+                description: CREATED_EVENTS_LIST.rows[0].description,
             });
 
             expect(queryStub).calledWith(sql, event);

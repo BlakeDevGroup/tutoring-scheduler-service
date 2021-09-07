@@ -6,7 +6,8 @@ import express from "express";
 import SeriesRouter from "./series.router";
 
 let SERIES_DATA: Object;
-
+const CALENDAR_ID = "2";
+const SERIES_ID = "48";
 let app: express.Application = express();
 app.use(express.json());
 app.use("/", new SeriesRouter().configureRouter());
@@ -16,7 +17,7 @@ describe("SeriesRoutes", () => {
         SERIES_DATA = {
             title: "Test Series",
             description: "Test Series description",
-            calendar_id: 1,
+            calendar_id: CALENDAR_ID,
             start_time: "10:30",
             end_time: "14:30",
             start_recur: "2021-08-31",
@@ -32,7 +33,7 @@ describe("SeriesRoutes", () => {
         it("should return all series with status 200", async () => {
             const response = await request(app)
                 .get("/series")
-                .send({ calendar_id: 1 });
+                .send({ calendar_id: CALENDAR_ID });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -293,10 +294,10 @@ describe("SeriesRoutes", () => {
             );
         });
 
-        it("when series_id  exist on calendar_id then send 200 and series data", async () => {
+        it("when series_id exist on calendar_id then send 200 and series data", async () => {
             const response = await request(app)
-                .get("/series/1")
-                .send({ calendar_id: 1 });
+                .get(`/series/${SERIES_ID}`)
+                .send({ calendar_id: CALENDAR_ID });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -314,8 +315,8 @@ describe("SeriesRoutes", () => {
     describe("DELETE /series/:series_id", () => {
         it("when delete is successful then send 200 status", async () => {
             const response = await request(app)
-                .delete("/series/1")
-                .send({ calendar_id: 1 });
+                .delete(`/series/${SERIES_ID}`)
+                .send({ calendar_id: CALENDAR_ID });
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -335,7 +336,7 @@ describe("SeriesRoutes", () => {
         it("when title is not a string then return error with status 400", async () => {
             const VALUE = 123;
             const response = await request(app)
-                .put("/series/1")
+                .put(`/series/${SERIES_ID}`)
                 .send(Object.assign(SERIES_DATA, { title: VALUE }));
 
             expect(response.statusCode).to.equal(400);
@@ -351,7 +352,7 @@ describe("SeriesRoutes", () => {
 
         it("when put is successful then send 200 status", async () => {
             const response = await request(app)
-                .put("/series/1")
+                .put(`/series/${SERIES_ID}`)
                 .send(SERIES_DATA);
 
             expect(response.statusCode).to.equal(200);
@@ -365,7 +366,7 @@ describe("SeriesRoutes", () => {
             );
             expect(response.body.data).to.be.an("object");
             expect(response.body.data).to.deep.equal(
-                Object.assign(SERIES_DATA, { series_id: "1" })
+                Object.assign(SERIES_DATA, { series_id: SERIES_ID })
             );
         });
     });
@@ -374,7 +375,7 @@ describe("SeriesRoutes", () => {
         it("when title is not a string then return error with status 400", async () => {
             const VALUE = 123;
             const response = await request(app)
-                .patch("/series/1")
+                .patch(`/series/${SERIES_ID}`)
                 .send(Object.assign(SERIES_DATA, { title: VALUE }));
 
             expect(response.statusCode).to.equal(400);
@@ -390,7 +391,7 @@ describe("SeriesRoutes", () => {
 
         it("when patch is successful then send 200 status", async () => {
             const response = await request(app)
-                .patch("/series/1")
+                .patch(`/series/${SERIES_ID}`)
                 .send(SERIES_DATA);
 
             expect(response.statusCode).to.equal(200);
@@ -404,7 +405,7 @@ describe("SeriesRoutes", () => {
             );
             expect(response.body.data).to.be.an("object");
             expect(response.body.data).to.deep.equal(
-                Object.assign(SERIES_DATA, { series_id: "1" })
+                Object.assign(SERIES_DATA, { series_id: SERIES_ID })
             );
         });
     });
