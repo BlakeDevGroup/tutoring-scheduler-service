@@ -32,6 +32,18 @@ class EventsController {
         }
     }
 
+    async getEventByIdAndCalendarId(
+        req: express.Request,
+        res: express.Response
+    ) {
+        const event = await this.eventService.readByIdAndCalendarId(
+            req.body.event_id,
+            req.body.calendar_id
+        );
+
+        res.status(event.statusCode).send(event);
+    }
+
     async createEvent(req: express.Request, res: express.Response) {
         const result = await this.eventService.create(req.body);
 

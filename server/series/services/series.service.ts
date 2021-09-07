@@ -2,32 +2,37 @@ import { CRUD } from "../../common/interfaces/crud.interface";
 import { CreateSeriesDto } from "../dtos/create.series.dto";
 import { PatchSeriesDto } from "../dtos/patch.series.dto";
 import { PutSeriesDto } from "../dtos/put.series.dto";
-import seriesDao from "../daos/series.dao";
+import SeriesDao from "../daos/series.dao";
 
 class SeriesService implements CRUD {
+    private seriesDao: SeriesDao = new SeriesDao();
     async create(resource: CreateSeriesDto) {
-        return seriesDao.addSeries(resource);
+        return this.seriesDao.addSeries(resource);
     }
 
     async deleteById(id: string) {
-        return seriesDao.removeSeriesById(id);
+        return this.seriesDao.removeSeriesById(id);
     }
 
     async list(limit: number, page: number) {
-        return seriesDao.getSeries();
+        return this.seriesDao.getSeries();
     }
 
     async patchById(id: string, resource: PatchSeriesDto) {
-        return seriesDao.patchSeriesById(id, resource);
+        return this.seriesDao.patchSeriesById(id, resource);
     }
 
     async putById(id: string, resource: PutSeriesDto) {
-        return seriesDao.putSeriesById(id, resource);
+        return this.seriesDao.putSeriesById(id, resource);
     }
 
     async readById(id: string) {
-        return seriesDao.getSeriesById(id);
+        return this.seriesDao.getSeriesById(id);
+    }
+
+    async readByIdAndCalendarId(seriesId: string, calendarId: string) {
+        return this.seriesDao.getSeriesByIdAndCalendarId(seriesId, calendarId);
     }
 }
 
-export default new SeriesService();
+export default SeriesService;

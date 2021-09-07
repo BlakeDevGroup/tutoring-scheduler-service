@@ -179,4 +179,25 @@ describe("EventController", () => {
             expect(res.statusCode).to.equal(200);
         });
     });
+
+    describe("should get event by calendar_id", () => {
+        it("should send proper response with proper statusCode", async () => {
+            eventServiceStub = sinon
+                .stub(EventService.prototype, "readByIdAndCalendarId")
+                .resolves(RESOLVED);
+            let req = createRequest({
+                body: {
+                    calendar_id: "1",
+                    event_id: "1",
+                },
+            });
+
+            let res = createResponse();
+
+            await eventController.getEventByIdAndCalendarId(req, res);
+
+            expect(res.statusCode).to.equal(200);
+            expect(res._getData()).to.eql(RESOLVED);
+        });
+    });
 });

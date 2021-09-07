@@ -22,7 +22,9 @@ export default class EventRouter extends CommonRouterConfig {
             body("date_end").custom(
                 this.eventsMiddleware.isDateValid.bind(this.eventsMiddleware)
             ),
+
             BodyValidationMiddleware.verifyBodyFieldsErrors,
+
             this.eventsMiddleware.startDateIsLessThanEndDate.bind(
                 this.eventsMiddleware
             ),

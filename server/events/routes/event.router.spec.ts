@@ -22,7 +22,7 @@ app = express();
 app.use(express.json());
 app.use("/", new EventRouter().configureRouter());
 
-describe.only("EventRouter", () => {
+describe("EventRouter", () => {
     beforeEach(() => {
         PAYLOAD = {
             date_end: "2021-07-29T15:30",
@@ -86,7 +86,7 @@ describe.only("EventRouter", () => {
     describe("GET /events/:id", () => {
         it("should send event when event_id exists on calendar_id", async () => {
             const response = await request(app)
-                .get("/events/319")
+                .get(`/events/${EVENT_ID}`)
                 .send({ calendar_id: CALENDAR_ID });
 
             expect(response.statusCode).to.equal(200);
@@ -116,7 +116,7 @@ describe.only("EventRouter", () => {
             const EVENT_ID = 9999;
             const response = await request(app)
                 .get(`/events/${EVENT_ID}`)
-                .send({ calendarId: 1 });
+                .send({ calendar_id: 1 });
 
             expect(response.statusCode).to.equal(404);
             expect(response.body)
@@ -124,7 +124,7 @@ describe.only("EventRouter", () => {
                 .and.includes.keys("success", "message", "error", "statusCode");
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `No event found with id: ${EVENT_ID}`
+                `Event with id: ${EVENT_ID} does not exist on calendar with id: 1`
             );
         });
     });
@@ -291,7 +291,7 @@ describe.only("EventRouter", () => {
         });
     });
 
-    describe("/events:id", () => {
+    describe("/events/:id", () => {
         it("should return error object and status code 404 when event is not found", async function () {
             const response = await request(app)
                 .get("/events/9999")
@@ -306,7 +306,7 @@ describe.only("EventRouter", () => {
             );
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `No event found with id: 9999`
+                `Event with id: 9999 does not exist on calendar with id: 1`
             );
         });
         it("should throw error when date_start is not a valid JS Date string", async () => {
@@ -427,7 +427,7 @@ describe.only("EventRouter", () => {
         it("should update an event and send status 200 with event data", async () => {
             const response = await request(app)
                 .put(`/events/${EVENT_ID}`)
-                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+                .send(Object.assign(PAYLOAD, { calendar_id: CALENDAR_ID }));
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -436,7 +436,10 @@ describe.only("EventRouter", () => {
 
             expect(response.body.success).to.equal(true);
             expect(response.body.data).to.deep.equal(
-                Object.assign(PAYLOAD, { calendar_id: 1, event_id: EVENT_ID })
+                Object.assign(PAYLOAD, {
+                    calendar_id: CALENDAR_ID,
+                    event_id: EVENT_ID,
+                })
             );
             expect(response.body.message).to.equal(
                 `Successfully updated event id: ${EVENT_ID}`
@@ -446,7 +449,7 @@ describe.only("EventRouter", () => {
         it("should update an event and send status 200 with event data", async () => {
             const response = await request(app)
                 .patch(`/events/${EVENT_ID}`)
-                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+                .send(Object.assign(PAYLOAD, { calendar_id: CALENDAR_ID }));
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -455,7 +458,10 @@ describe.only("EventRouter", () => {
 
             expect(response.body.success).to.equal(true);
             expect(response.body.data).to.deep.equal(
-                Object.assign(PAYLOAD, { calendar_id: 1, event_id: EVENT_ID })
+                Object.assign(PAYLOAD, {
+                    calendar_id: CALENDAR_ID,
+                    event_id: EVENT_ID,
+                })
             );
             expect(response.body.message).to.equal(
                 `Successfully patched event id: ${EVENT_ID}`
@@ -465,7 +471,7 @@ describe.only("EventRouter", () => {
         it("should delete an event and send status 200", async () => {
             const response = await request(app)
                 .delete(`/events/${EVENT_ID}`)
-                .send(Object.assign(PAYLOAD, { calendar_id: 1 }));
+                .send(Object.assign(PAYLOAD, { calendar_id: CALENDAR_ID }));
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -476,6 +482,25 @@ describe.only("EventRouter", () => {
             expect(response.body.data).to.deep.equal([]);
             expect(response.body.message).to.equal(
                 "Successfully removed event"
+            );
+        });
+    });
+
+    describe("GET /events/:event_id", () => {
+        it("should return error when event_id does not exist on calendar_id", async () => {
+            const EVENT_ID = 35;
+            const response = await request(app)
+                .get(`/events/${EVENT_ID}`)
+                .send({ calendar_id: 2 });
+
+            expect(response.statusCode).to.equal(404);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Event with id: ${EVENT_ID} does not exist on calendar with id: 2`
             );
         });
     });

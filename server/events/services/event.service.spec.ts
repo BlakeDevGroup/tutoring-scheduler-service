@@ -126,14 +126,27 @@ describe("EventService", () => {
                 .resolves(RESOLVED);
 
             const result = await eventService.listByCalendarId(
-                parseInt(EVENT_ID),
+                EVENT_ID,
                 100,
                 10
             );
 
             expect(eventDaoStub).calledOnce;
-            expect(eventDaoStub).calledWith(parseInt(EVENT_ID));
+            expect(eventDaoStub).calledWith(EVENT_ID);
             expect(result).to.equal(RESOLVED);
+        });
+    });
+
+    describe("read event by calendar_id", () => {
+        it("should call function with proper arguments", async () => {
+            eventDaoStub = sinon.stub(
+                EventDao.prototype,
+                "getEventByCalendarId"
+            );
+
+            await eventService.readByIdAndCalendarId("1", "1");
+            expect(eventDaoStub).calledOnce;
+            expect(eventDaoStub).calledWith("1", "1");
         });
     });
 });

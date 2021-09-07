@@ -1,13 +1,12 @@
-import sinon, { SinonSandbox, spy } from "sinon";
+import sinon, { SinonSandbox, SinonSpy, SinonStub } from "sinon";
 import chai, { expect, should } from "chai";
 import sinonChai from "sinon-chai";
 import proxyquire from "proxyquire";
 import CalendarDao from "./calendar.dao";
 import { ServerResponsePayload } from "../../common/services/message/message.service";
 import * as messageService from "../../common/services/message/message.service";
-import { query } from "express";
+import { query } from "winston";
 chai.use(sinonChai);
-let queryStub = sinon.stub();
 const SUCCESS: ServerResponsePayload = {
     message: "Successfully created calendar",
     success: true,
@@ -23,21 +22,31 @@ const FAILED: ServerResponsePayload = {
 const ERROR = new Error("Fake Error");
 const CALENDAR_DATA = { name: "My Test Calendar" };
 const CALENDAR_ID = "1";
-let spySuccess = sinon.spy(messageService, "sendSuccess");
-let spyFailure = sinon.spy(messageService, "sendFailure");
+
+let queryStub: SinonStub = sinon.stub();
+let spySuccess: SinonSpy;
+let spyFailure: SinonSpy;
+let sandBox: SinonSandbox;
 describe("CalendarDao", function () {
     let CalendarDao = proxyquire("./calendar.dao", {
         "../../common/services/postgres.service": { query: queryStub },
     }).default;
     const calendarDao: CalendarDao = new CalendarDao();
 
+    before(() => {
+        sandBox = sinon.createSandbox();
+        spySuccess = sandBox.spy(messageService, "sendSuccess");
+        spyFailure = sandBox.spy(messageService, "sendFailure");
+    });
+    after(() => {
+        sandBox.restore();
+    });
     beforeEach(() => {
         queryStub.resolves({ rows: [] });
     });
     afterEach(() => {
-        sinon.reset();
-        spySuccess.resetHistory();
         queryStub.reset();
+        spySuccess.resetHistory();
         spyFailure.resetHistory();
     });
 

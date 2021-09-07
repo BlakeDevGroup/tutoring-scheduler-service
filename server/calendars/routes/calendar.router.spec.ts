@@ -8,6 +8,7 @@ import CalendarRouter from "./calendar.router";
 let app: express.Application = express();
 app.use(express.json());
 new CalendarRouter(app).configureRoutes();
+const CALENDAR_ID = "2";
 
 describe("CalendarRoutes", () => {
     beforeEach(() => {});
@@ -89,7 +90,7 @@ describe("CalendarRoutes", () => {
         });
 
         it("should retrieve calendar and send status 200", async () => {
-            const response = await request(app).get("/calendars/1");
+            const response = await request(app).get("/calendars/83");
 
             expect(response.statusCode).to.equal(200);
             expect(response.body)
@@ -108,7 +109,7 @@ describe("CalendarRoutes", () => {
 
     describe("DELETE /calendars/:calendar_id", () => {
         it("should delete calendar with status 200", async () => {
-            const response = await request(app).delete("/calendars/1");
+            const response = await request(app).delete("/calendars/83");
 
             expect(response.statusCode).to.equal(200);
 
@@ -128,7 +129,7 @@ describe("CalendarRoutes", () => {
         it("should send error with status 400 if name is not string", async () => {
             const VALUE = 123;
             const response = await request(app)
-                .put("/calendars/1")
+                .put(`/calendars/${CALENDAR_ID}`)
                 .send({ name: VALUE });
 
             expect(response.statusCode).to.equal(400);
@@ -143,7 +144,7 @@ describe("CalendarRoutes", () => {
 
         it("should update calendar and send status 200", async () => {
             const response = await request(app)
-                .put("/calendars/1")
+                .put(`/calendars/${CALENDAR_ID}`)
                 .send({ name: "Caleb" });
 
             expect(response.statusCode).to.equal(200);
@@ -153,7 +154,7 @@ describe("CalendarRoutes", () => {
 
             expect(response.body.success).to.equal(true);
             expect(response.body.message).to.equal(
-                "Successfully updated calendar id: 1"
+                `Successfully updated calendar id: ${CALENDAR_ID}`
             );
             expect(response.body.data)
                 .to.be.an("object")
@@ -165,7 +166,7 @@ describe("CalendarRoutes", () => {
         it("should send error with status 400 if name is not string", async () => {
             const VALUE = 123;
             const response = await request(app)
-                .patch("/calendars/1")
+                .patch(`/calendars/${CALENDAR_ID}`)
                 .send({ name: VALUE });
 
             expect(response.statusCode).to.equal(400);
@@ -180,7 +181,7 @@ describe("CalendarRoutes", () => {
 
         it("should update calendar and send status 200", async () => {
             const response = await request(app)
-                .patch("/calendars/1")
+                .patch(`/calendars/${CALENDAR_ID}`)
                 .send({ name: "Caleb" });
 
             expect(response.statusCode).to.equal(200);
@@ -190,7 +191,7 @@ describe("CalendarRoutes", () => {
 
             expect(response.body.success).to.equal(true);
             expect(response.body.message).to.equal(
-                "Successfully updated calendar id: 1"
+                `Successfully updated calendar id: ${CALENDAR_ID}`
             );
             expect(response.body.data)
                 .to.be.an("object")

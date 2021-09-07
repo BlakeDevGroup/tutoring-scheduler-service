@@ -1,9 +1,10 @@
-import sinon, { SinonSandbox, SinonStub, spy } from "sinon";
-import chai, { expect, should } from "chai";
+import sinon, { SinonSandbox, SinonStub } from "sinon";
+import { expect } from "chai";
 import sinonChai from "sinon-chai";
 import CalendarService from "./calendar.service";
 import CalendarDao from "../daos/calendar.dao";
 let calendarDao: CalendarDao;
+let calendarService: CalendarService;
 let calendarDaoStub: SinonStub = sinon.stub();
 const RESOLVED = {
     success: true,
@@ -15,6 +16,7 @@ const CALENDAR_ID = "1";
 describe("EventService", () => {
     beforeEach(() => {
         calendarDao = new CalendarDao();
+        calendarService = new CalendarService();
     });
     afterEach(() => {
         sinon.reset();
@@ -27,7 +29,7 @@ describe("EventService", () => {
                 .stub(CalendarDao.prototype, "addCalendar")
                 .resolves(RESOLVED);
 
-            const result = await calendarDao.addCalendar(CALENDAR_DATA);
+            const result = await calendarService.create(CALENDAR_DATA);
 
             expect(calendarDaoStub).calledOnce;
             expect(calendarDaoStub).calledWith(CALENDAR_DATA);
@@ -41,7 +43,7 @@ describe("EventService", () => {
                 .stub(CalendarDao.prototype, "removeCalendarById")
                 .resolves(RESOLVED);
 
-            const result = await calendarDao.removeCalendarById(CALENDAR_ID);
+            const result = await calendarService.deleteById(CALENDAR_ID);
 
             expect(calendarDaoStub).calledOnce;
             expect(calendarDaoStub).calledWith(CALENDAR_ID);
@@ -54,7 +56,7 @@ describe("EventService", () => {
             calendarDaoStub = sinon
                 .stub(CalendarDao.prototype, "getCalendars")
                 .resolves(RESOLVED);
-            const result = await calendarDao.getCalendars();
+            const result = await calendarService.list(100, 0);
 
             expect(calendarDaoStub).calledOnce;
             expect(calendarDaoStub).calledWith();
@@ -68,7 +70,7 @@ describe("EventService", () => {
                 .stub(CalendarDao.prototype, "patchCalendarById")
                 .resolves(RESOLVED);
 
-            const result = await calendarDao.patchCalendarById(
+            const result = await calendarService.patchById(
                 CALENDAR_ID,
                 CALENDAR_DATA
             );
@@ -85,7 +87,7 @@ describe("EventService", () => {
                 .stub(CalendarDao.prototype, "putCalendarById")
                 .resolves(RESOLVED);
 
-            const result = await calendarDao.putCalendarById(
+            const result = await calendarService.putById(
                 CALENDAR_ID,
                 CALENDAR_DATA
             );
@@ -102,7 +104,7 @@ describe("EventService", () => {
                 .stub(CalendarDao.prototype, "getCalendarById")
                 .resolves(RESOLVED);
 
-            const result = await calendarDao.getCalendarById(CALENDAR_ID);
+            const result = await calendarService.readById(CALENDAR_ID);
 
             expect(calendarDaoStub).calledOnce;
             expect(calendarDaoStub).calledWith(CALENDAR_ID);
