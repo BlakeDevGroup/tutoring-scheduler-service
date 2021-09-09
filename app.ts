@@ -8,7 +8,7 @@ import { UsersRoutes } from "./server/users/users.routes.config";
 import CalendarRoutes from "./server/calendars/routes/calendar.router";
 import { PaymentOverrideRoutes } from "./server/payment_overrides/payment_override.routes.config";
 import { CancellationRoutes } from "./server/cancellations/cancellation.routes.config";
-import { CompanyRoutes } from "./server/companies/company.routes.config";
+import { CompanyRoutes } from "./server/companies/routes/company.routes";
 import debug from "debug";
 
 const app: express.Application = express();

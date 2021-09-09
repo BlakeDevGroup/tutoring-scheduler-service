@@ -1,45 +1,54 @@
 import express from "express";
-import companyServices from "../services/company.services";
+import CompanyServices from "../services/company.service";
 import debug from "debug";
 
 const log: debug.IDebugger = debug("add:company-controller");
 
 class CompanyController {
+    private companyService: CompanyServices = new CompanyServices();
     async listCompanies(req: express.Request, res: express.Response) {
-        const companies = await companyServices.list(100, 0);
+        const companies = await this.companyService.list(100, 0);
 
-        res.status(200).send(companies);
+        res.status(companies.statusCode).send(companies);
     }
 
     async getCompanyById(req: express.Request, res: express.Response) {
-        const company = await companyServices.readById(req.body.companyId);
+        const company = await this.companyService.readById(req.body.company_id);
 
-        res.status(200).send(company);
+        res.status(company.statusCode).send(company);
     }
 
     async createCompany(req: express.Request, res: express.Response) {
-        const company = await companyServices.create(req.body);
+        const company = await this.companyService.create(req.body);
 
-        res.status(200).send(company);
+        res.status(company.statusCode).send(company);
     }
 
     async patch(req: express.Request, res: express.Response) {
-        log(await companyServices.patchById(req.body.companyId, req.body));
+        const company = await this.companyService.patchById(
+            req.body.company_id,
+            req.body
+        );
 
-        res.status(204).send();
+        res.status(company.statusCode).send(company);
     }
 
     async put(req: express.Request, res: express.Response) {
-        log(await companyServices.putById(req.body.companyId, req.body));
+        const company = await this.companyService.putById(
+            req.body.company_id,
+            req.body
+        );
 
-        res.status(204).send();
+        res.status(company.statusCode).send(company);
     }
 
     async removeCompany(req: express.Request, res: express.Response) {
-        log(await companyServices.deleteById(req.body.companyId));
+        const company = await this.companyService.deleteById(
+            req.body.company_id
+        );
 
-        res.status(204).send();
+        res.status(company.statusCode).send(company);
     }
 }
 
-export default new CompanyController();
+export default CompanyController;
