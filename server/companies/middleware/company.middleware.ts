@@ -1,23 +1,24 @@
 import express from "express";
-import companyServices from "../services/company.services";
+import CompanyService from "../services/company.service";
 import debug from "debug";
 
 const log: debug.IDebugger = debug("app:company-middleware");
 
 class CompaynMiddleware {
+    private companyService: CompanyService = new CompanyService();
     async validateCompanyExists(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
-        const company = await companyServices.readById(req.params.companyId);
+        const company = await this.companyService.readById(
+            req.params.company_id
+        );
 
-        if (company) {
+        if (company.success) {
             next();
         } else {
-            res.status(404).send({
-                error: `Company ${req.params.companyId} not found`,
-            });
+            res.status(company.statusCode).send(company);
         }
     }
 
@@ -26,9 +27,9 @@ class CompaynMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        req.body.companyId = req.params.companyId;
+        req.body.company_id = req.params.company_id;
         next();
     }
 }
 
-export default new CompaynMiddleware();
+export default CompaynMiddleware;
