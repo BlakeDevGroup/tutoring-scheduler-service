@@ -5,7 +5,7 @@ import express from "express";
 
 import EventRouter from "./event.router";
 const CALENDAR_ID = "2";
-const EVENT_ID = "319";
+const EVENT_ID = "336";
 // import app from "../../../app";
 type Payload = {
     date_end: string;

@@ -25,7 +25,7 @@ let next: express.NextFunction;
 let companyMiddleware: CompanyMiddleware;
 let stub: SinonStub;
 
-describe.only("CompanyMiddleware", () => {
+describe("CompanyMiddleware", () => {
     beforeEach(() => {
         next = sinon.stub().callsFake(() => {});
         companyMiddleware = new CompanyMiddleware();
