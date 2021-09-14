@@ -1,4 +1,3 @@
-import { CommonRoutesConfig } from "../../common/common.routes.config";
 import EventsController from "../controllers/event.controller";
 import EventsMiddleware from "../middleware/event.middleware";
 import BodyValidationMiddleware from "../../common/middleware/body.validation.middleware";

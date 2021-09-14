@@ -78,7 +78,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: title value: ${VALUE}`
+                `Invalid value for param: title value: ${VALUE}`
             );
         });
         it("when description is not a string then return error with status 400", async () => {
@@ -94,7 +94,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: description value: ${VALUE}`
+                `Invalid value for param: description value: ${VALUE}`
             );
         });
         it("when start_time is not a string then return error with status 400", async () => {
@@ -110,7 +110,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: start_time value: ${VALUE}`
+                `Invalid value for param: start_time value: ${VALUE}`
             );
         });
 
@@ -127,7 +127,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: end_time value: ${VALUE}`
+                `Invalid value for param: end_time value: ${VALUE}`
             );
         });
 
@@ -144,7 +144,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: start_recur value: ${VALUE}`
+                `Invalid value for param: start_recur value: ${VALUE}`
             );
         });
 
@@ -161,7 +161,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: end_recur value: ${VALUE}`
+                `Invalid value for param: end_recur value: ${VALUE}`
             );
         });
 
@@ -178,7 +178,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: days_of_week value: ${VALUE}`
+                `Invalid value for param: days_of_week value: ${VALUE}`
             );
         });
         it("when start_time > end_time then return error with status 400", async () => {
@@ -237,7 +237,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: start_time value: ${VALUE}`
+                `Invalid value for param: start_time value: ${VALUE}`
             );
         });
 
@@ -254,7 +254,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: end_time value: ${VALUE}`
+                `Invalid value for param: end_time value: ${VALUE}`
             );
         });
 
@@ -346,7 +346,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: title value: ${VALUE}`
+                `Invalid value for param: title value: ${VALUE}`
             );
         });
 
@@ -385,7 +385,7 @@ describe("SeriesRoutes", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: title value: ${VALUE}`
+                `Invalid value for param: title value: ${VALUE}`
             );
         });
 

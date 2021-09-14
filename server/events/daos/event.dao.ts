@@ -19,7 +19,7 @@ export default class EventDao {
     }
 
     async addEvent(event: CreateEventDto): Promise<ServerResponsePayload> {
-        const sql = `INSERT INTO "${this.tableName}" (date_start, date_end, title, all_day, calendar_id, user_id, description) VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+        const sql = `INSERT INTO "${this.tableName}" (date_start, date_end, title, all_day, calendar_id, user_id, description, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
         try {
             const { rows } = await query(sql, [
                 event.date_start,
@@ -29,6 +29,7 @@ export default class EventDao {
                 event.calendar_id,
                 event.user_id,
                 event.description,
+                event.company_id,
             ]);
 
             return sendSuccess("Event created successfully", [], 201);
@@ -107,7 +108,7 @@ export default class EventDao {
         eventId: string,
         event: PutEventDto
     ): Promise<ServerResponsePayload> {
-        const sql = `UPDATE "${this.tableName}" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6, description = $8 WHERE calendar_id = $7 and event_id = $1`;
+        const sql = `UPDATE "${this.tableName}" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6, description = $8, company_id = $9 WHERE calendar_id = $7 and event_id = $1`;
         try {
             const { rows } = await query(sql, [
                 eventId,
@@ -118,6 +119,7 @@ export default class EventDao {
                 event.user_id,
                 event.calendar_id,
                 event.description,
+                event.company_id,
             ]);
 
             return sendSuccess(
@@ -133,7 +135,7 @@ export default class EventDao {
         eventId: string,
         event: PatchEventDto
     ): Promise<ServerResponsePayload> {
-        const sql = `UPDATE "${this.tableName}" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6, description = $8 WHERE calendar_id = $7 and event_id = $1`;
+        const sql = `UPDATE "${this.tableName}" SET date_start = $2, date_end = $3, title = $4, all_day = $5, user_id = $6, description = $8, company_id = $9 WHERE calendar_id = $7 and event_id = $1`;
         try {
             const { rows } = await query(sql, [
                 eventId,
@@ -144,6 +146,7 @@ export default class EventDao {
                 event.user_id,
                 event.calendar_id,
                 event.description,
+                event.company_id,
             ]);
 
             return sendSuccess(
