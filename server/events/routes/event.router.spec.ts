@@ -148,7 +148,7 @@ describe("EventRouter", () => {
                 .and.include.keys("error", "message", "statusCode", "success");
 
             expect(response.body.message).to.equal(
-                "Invalid Value for param: date_start value: XXXX"
+                "Invalid value for param: date_start value: XXXX"
             );
             expect(response.body.success).to.equal(false);
         });
@@ -171,7 +171,7 @@ describe("EventRouter", () => {
                 .and.include.keys("error", "message", "statusCode", "success");
 
             expect(response.body.message).to.equal(
-                "Invalid Value for param: date_end value: XXXX"
+                "Invalid value for param: date_end value: XXXX"
             );
             expect(response.body.success).to.equal(false);
         });
@@ -217,7 +217,7 @@ describe("EventRouter", () => {
                 .and.include.keys("error", "message", "statusCode", "success");
 
             expect(response.body.message).to.equal(
-                "Invalid Value for param: title value: 123"
+                "Invalid value for param: title value: 123"
             );
             expect(response.body.success).to.equal(false);
         });
@@ -240,7 +240,7 @@ describe("EventRouter", () => {
                 .and.include.keys("error", "message", "statusCode", "success");
 
             expect(response.body.message).to.equal(
-                "Invalid Value for param: all_day value: XXXX"
+                "Invalid value for param: all_day value: XXXX"
             );
             expect(response.body.success).to.equal(false);
         });
@@ -262,7 +262,7 @@ describe("EventRouter", () => {
                 .and.include.keys("error", "message", "statusCode", "success");
 
             expect(response.body.message).to.equal(
-                "Invalid Value for param: user_id value: XXXX"
+                "Invalid value for param: user_id value: XXXX"
             );
             expect(response.body.success).to.equal(false);
         });
@@ -328,7 +328,7 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: date_start value: ${VALUE}`
+                `Invalid value for param: date_start value: ${VALUE}`
             );
         });
 
@@ -351,7 +351,7 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: date_end value: ${VALUE}`
+                `Invalid value for param: date_end value: ${VALUE}`
             );
         });
 
@@ -374,7 +374,7 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: title value: ${VALUE}`
+                `Invalid value for param: title value: ${VALUE}`
             );
         });
 
@@ -397,7 +397,7 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: all_day value: ${VALUE}`
+                `Invalid value for param: all_day value: ${VALUE}`
             );
         });
 
@@ -420,7 +420,7 @@ describe("EventRouter", () => {
 
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                `Invalid Value for param: user_id value: ${VALUE}`
+                `Invalid value for param: user_id value: ${VALUE}`
             );
         });
 

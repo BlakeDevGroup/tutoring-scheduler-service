@@ -6,4 +6,5 @@ export interface PatchEventDto {
     calendar_id: number;
     user_id: number;
     description: string;
+    company_id: number;
 }

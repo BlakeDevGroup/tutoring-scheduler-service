@@ -51,7 +51,7 @@ describe("CalendarRoutes", () => {
                 .and.include.keys("success", "message", "error");
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                "Invalid Value for param: name value: 123"
+                "Invalid value for param: name value: 123"
             );
         });
 
@@ -138,7 +138,7 @@ describe("CalendarRoutes", () => {
                 .and.include.keys("success", "message", "error");
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                "Invalid Value for param: name value: 123"
+                "Invalid value for param: name value: 123"
             );
         });
 
@@ -175,7 +175,7 @@ describe("CalendarRoutes", () => {
                 .and.include.keys("success", "message", "error");
             expect(response.body.success).to.equal(false);
             expect(response.body.message).to.equal(
-                "Invalid Value for param: name value: 123"
+                "Invalid value for param: name value: 123"
             );
         });
 

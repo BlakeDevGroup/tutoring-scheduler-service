@@ -12,7 +12,7 @@ class BodyValidationMiddleware {
         if (!errors.isEmpty()) {
             const parameter: string = errors.array()[0].param;
             const value: string = errors.array()[0].value;
-            const message: string = `Invalid Value for param: ${parameter} value: ${value}`;
+            const message: string = `Invalid value for param: ${parameter} value: ${value}`;
             return res
                 .status(400)
                 .send(sendFailure(message, new Error(message)));
