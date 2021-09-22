@@ -4,6 +4,11 @@ import { PutCancellationDto } from "../dtos/put.cancellation.dto";
 import debug from "debug";
 import { query } from "../../common/services/postgres.service";
 import { Query } from "pg";
+import {
+    sendFailure,
+    sendSuccess,
+    ServerResponsePayload,
+} from "../../common/services/message/message.service";
 
 const log: debug.IDebugger = debug("app:cancellation-dao");
 
@@ -14,89 +19,124 @@ class CancellationDao {
         log("Created new instance of CancellationDao");
     }
 
-    async addCancellation(cancellation: CreateCancellationDto): Promise<Query> {
-        const sql = `
-            INSERT INTO "${this.tableName}" (amount, reason, event_id)
-            VALUES ($1, $2, $3)
-        `;
+    async addCancellation(
+        cancellation: CreateCancellationDto
+    ): Promise<ServerResponsePayload> {
+        const sql = `INSERT INTO "${this.tableName}" (amount, reason, event_id) VALUES ($1, $2, $3)`;
+        try {
+            const { rows } = await query(sql, [
+                cancellation.amount,
+                cancellation.reason,
+                cancellation.event_id,
+            ]);
 
-        const { rows } = await query(sql, [
-            cancellation.amount,
-            cancellation.reason,
-            cancellation.event_id,
-        ]);
-
-        return rows[0];
+            return sendSuccess("Successfully created cancellation", [], 201);
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
     }
 
-    async getCancellations(): Promise<Query> {
-        const sql = `
-            SELECT * FROM "${this.tableName}"
-        `;
+    async getCancellations(): Promise<ServerResponsePayload> {
+        const sql = `SELECT * FROM "${this.tableName}"`;
 
-        const { rows } = await query(sql, []);
+        try {
+            const { rows } = await query(sql, []);
 
-        return rows;
+            return sendSuccess("Successfully retrieved cancellations", rows);
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
     }
 
-    async getCancellationById(cancellationId: string): Promise<Query> {
-        const sql = `
-            SELECT * FROM "${this.tableName}"
-            WHERE cancellation_id = $1
-        `;
+    async getCancellationById(
+        cancellationId: string
+    ): Promise<ServerResponsePayload> {
+        const sql = `SELECT * FROM "${this.tableName}" WHERE cancellation_id = $1`;
+        try {
+            const { rows } = await query(sql, [cancellationId]);
 
-        const { rows } = await query(sql, [cancellationId]);
-
-        return rows[0];
+            if (rows.length > 0) {
+                return sendSuccess(
+                    "Successfully retrieved cancellation",
+                    rows[0]
+                );
+            } else {
+                const ERROR_MESSAGE = `No cancellation found with id: ${cancellationId}`;
+                return sendFailure(
+                    ERROR_MESSAGE,
+                    new Error(ERROR_MESSAGE),
+                    404
+                );
+            }
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
     }
 
     async putCancellationById(
         cancellationId: string,
         cancellation: PutCancellationDto
-    ): Promise<Query> {
-        const sql = `
-            UPDATE "${this.tableName}"
-            SET amount = $2, reason = $2, event_id = $3
-            WHERE cancellation_id = $1
-        `;
+    ): Promise<ServerResponsePayload> {
+        const sql = `UPDATE "${this.tableName}" SET amount = $2, reason = $2, event_id = $3 WHERE cancellation_id = $1`;
 
-        const { rows } = await query(sql, [
-            cancellationId,
-            cancellation.amount,
-            cancellation.reason,
-            cancellation.event_id,
-        ]);
+        try {
+            const { rows } = await query(sql, [
+                cancellationId,
+                cancellation.amount,
+                cancellation.reason,
+                cancellation.event_id,
+            ]);
 
-        return rows[0];
+            return sendSuccess(
+                "Successfully updated cancellation",
+                Object.assign(
+                    {},
+                    { cancellation_id: cancellationId },
+                    cancellation
+                )
+            );
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
     }
 
     async patchCancellationById(
         cancellationId: string,
         cancellation: PatchCancellationDto
-    ): Promise<Query> {
-        const sql = `
-            UPDATE "${this.tableName}"
-            SET amount = $2, reason = $2, event_id = $3
-            WHERE cancellation_id = $1
-        `;
+    ): Promise<ServerResponsePayload> {
+        const sql = `UPDATE "${this.tableName}" SET amount = $2, reason = $2, event_id = $3 WHERE cancellation_id = $1`;
 
-        const { rows } = await query(sql, [
-            cancellationId,
-            cancellation.amount,
-            cancellation.reason,
-            cancellation.event_id,
-        ]);
+        try {
+            const { rows } = await query(sql, [
+                cancellationId,
+                cancellation.amount,
+                cancellation.reason,
+                cancellation.event_id,
+            ]);
 
-        return rows[0];
+            return sendSuccess(
+                "Successfully updated cancellation",
+                Object.assign(
+                    {},
+                    { cancellation_id: cancellationId },
+                    cancellation
+                )
+            );
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
     }
 
     async removeCancellationById(cancellationId: string) {
-        const sql = `
-            DELETE FROM "${this.tableName}" WHERE cancellation_id = $1
-        `;
+        const sql = `DELETE FROM "${this.tableName}" WHERE cancellation_id = $1`;
+        try {
+            await query(sql, [cancellationId]);
 
-        return await query(sql, [cancellationId]);
+            return sendSuccess("Successfully removed cancellation");
+        } catch (e) {
+            return sendFailure(e.message, e, 500);
+        }
     }
 }
 
-export default new CancellationDao();
+export default CancellationDao;

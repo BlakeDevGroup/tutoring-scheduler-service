@@ -8,7 +8,7 @@ import { CompanyRoutes } from "./company.routes";
 let app: express.Application = express();
 app.use(express.json());
 new CompanyRoutes(app).configureRoutes();
-const COMPANY_ID = "1";
+const COMPANY_ID = "48";
 let COMPANY_PAYLOAD = {
     name: "Test Company",
     pay_rate: 25,
