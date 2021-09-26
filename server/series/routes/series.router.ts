@@ -15,6 +15,8 @@ export default class SeriesRouter extends CommonRouterConfig {
         this.VALIDATE_PAYLOAD = [
             body("title").isString(),
             body("description").isString(),
+            body("user_id").isNumeric(),
+            body("company_id").isNumeric(),
             body("start_time").custom(
                 this.seriesMiddleware.validateTime.bind(this.seriesMiddleware)
             ),

@@ -16,6 +16,8 @@ const SERIES_DATA = {
     start_recur: "08-31-2021",
     end_recur: "08-31-2022",
     days_of_week: [0, 1, 2],
+    user_id: "1",
+    company_id: "1",
 };
 const SERIES_RETURN_VALUE = { rows: [{ series_id: 1 }] };
 const FAILED_ERROR = new Error("Failed");
@@ -55,7 +57,7 @@ describe("SeriesDao", () => {
     //should check if query is called with proper arguments
     //check if sendSucces is called with proper arguments
     describe("add a series", () => {
-        const sql = `INSERT INTO "ts.series" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+        const sql = `INSERT INTO "ts.series" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week, user_id, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
         it("should send success message and run with proper arguments", async () => {
             await seriesDao.addSeries(SERIES_DATA);
             expect(queryStub).calledOnce;
@@ -68,6 +70,8 @@ describe("SeriesDao", () => {
                 SERIES_DATA.start_recur,
                 SERIES_DATA.end_recur,
                 [0, 1, 2],
+                SERIES_DATA.user_id,
+                SERIES_DATA.company_id,
             ]);
 
             expect(spySuccess).calledOnce;
@@ -160,7 +164,7 @@ describe("SeriesDao", () => {
 
     describe("update series", () => {
         it("put a series change should send success and run with proper args", async () => {
-            const sql = `UPDATE "ts.series" SET title = $2, description = $3, calendar_id = $4, start_time = $5, end_time = $6, start_recur = $7, end_recur = $8, days_of_week = $9 WHERE series_id = $1`;
+            const sql = `UPDATE "ts.series" SET title = $2, description = $3, calendar_id = $4, start_time = $5, end_time = $6, start_recur = $7, end_recur = $8, days_of_week = $9, user_id = $10, company_id = $11 WHERE series_id = $1`;
 
             await seriesDao.putSeriesById(SERIES_ID, SERIES_DATA);
 
@@ -175,6 +179,8 @@ describe("SeriesDao", () => {
                 SERIES_DATA.start_recur,
                 SERIES_DATA.end_recur,
                 [0, 1, 2],
+                SERIES_DATA.user_id,
+                SERIES_DATA.company_id,
             ]);
 
             expect(spySuccess).calledOnce;
@@ -198,7 +204,7 @@ describe("SeriesDao", () => {
         });
 
         it("patch a series change should send success and run with proper args", async () => {
-            const sql = `UPDATE "ts.series" SET title = $2, description = $3, calendar_id = $4, start_time = $5, end_time = $6, start_recur = $7, end_recur = $8, days_of_week = $9 WHERE series_id = $1`;
+            const sql = `UPDATE "ts.series" SET title = $2, description = $3, calendar_id = $4, start_time = $5, end_time = $6, start_recur = $7, end_recur = $8, days_of_week = $9, user_id = $10, company_id = $11 WHERE series_id = $1`;
 
             await seriesDao.patchSeriesById(SERIES_ID, SERIES_DATA);
 
@@ -213,6 +219,8 @@ describe("SeriesDao", () => {
                 SERIES_DATA.start_recur,
                 SERIES_DATA.end_recur,
                 [0, 1, 2],
+                SERIES_DATA.user_id,
+                SERIES_DATA.company_id,
             ]);
 
             expect(spySuccess).calledOnce;
