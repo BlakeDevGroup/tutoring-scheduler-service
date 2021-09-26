@@ -4,6 +4,7 @@ import BodyValidationMiddleware from "../../common/middleware/body.validation.mi
 import express from "express";
 import { CommonRouterConfig } from "../../common/common.router.config";
 import { body } from "express-validator";
+import EventCancellationRouter from "../../cancellations/routes/event_cancellaton.router";
 
 export default class EventRouter extends CommonRouterConfig {
     private eventsController = new EventsController();
@@ -60,6 +61,11 @@ export default class EventRouter extends CommonRouterConfig {
                 ...this.VALIDATE_PAYLOAD,
                 this.eventsController.patch.bind(this.eventsController)
             );
+
+        this.router.use(
+            "/events/:event_id",
+            new EventCancellationRouter().configureRouter()
+        );
 
         return this.router;
     };

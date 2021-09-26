@@ -22,12 +22,14 @@ class CancellationDao {
     async addCancellation(
         cancellation: CreateCancellationDto
     ): Promise<ServerResponsePayload> {
-        const sql = `INSERT INTO "${this.tableName}" (amount, reason, event_id) VALUES ($1, $2, $3)`;
+        const sql = `INSERT INTO "${this.tableName}" (amount, reason, source, id, excluded_dates) VALUES ($1, $2, $3, $4, $5)`;
         try {
             const { rows } = await query(sql, [
                 cancellation.amount,
                 cancellation.reason,
-                cancellation.event_id,
+                cancellation.source,
+                cancellation.id,
+                cancellation.excluded_dates,
             ]);
 
             return sendSuccess("Successfully created cancellation", [], 201);
@@ -77,14 +79,16 @@ class CancellationDao {
         cancellationId: string,
         cancellation: PutCancellationDto
     ): Promise<ServerResponsePayload> {
-        const sql = `UPDATE "${this.tableName}" SET amount = $2, reason = $2, event_id = $3 WHERE cancellation_id = $1`;
+        const sql = `UPDATE "${this.tableName}" SET amount = $2, reason = $3, source = $4, id = $5, excluded_dates = $6 WHERE cancellation_id = $1`;
 
         try {
             const { rows } = await query(sql, [
                 cancellationId,
                 cancellation.amount,
                 cancellation.reason,
-                cancellation.event_id,
+                cancellation.source,
+                cancellation.id,
+                cancellation.excluded_dates,
             ]);
 
             return sendSuccess(
@@ -104,14 +108,16 @@ class CancellationDao {
         cancellationId: string,
         cancellation: PatchCancellationDto
     ): Promise<ServerResponsePayload> {
-        const sql = `UPDATE "${this.tableName}" SET amount = $2, reason = $2, event_id = $3 WHERE cancellation_id = $1`;
+        const sql = `UPDATE "${this.tableName}" SET amount = $2, reason = $3, source = $4, id = $5, excluded_dates = $6 WHERE cancellation_id = $1`;
 
         try {
             const { rows } = await query(sql, [
                 cancellationId,
                 cancellation.amount,
                 cancellation.reason,
-                cancellation.event_id,
+                cancellation.source,
+                cancellation.id,
+                cancellation.excluded_dates,
             ]);
 
             return sendSuccess(

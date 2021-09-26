@@ -7,7 +7,7 @@ import { CommonRoutesConfig } from "./server/common/common.routes.config";
 import { UsersRoutes } from "./server/users/users.routes.config";
 import CalendarRoutes from "./server/calendars/routes/calendar.router";
 import { PaymentOverrideRoutes } from "./server/payment_overrides/payment_override.routes.config";
-import { CancellationRoutes } from "./server/cancellations/cancellation.routes.config";
+import CancellationRouter from "./server/cancellations/routes/cancellation.router";
 import { CompanyRoutes } from "./server/companies/routes/company.routes";
 import debug from "debug";
 
@@ -40,7 +40,7 @@ app.use(expressWinston.logger(loggerOptions));
 routes.push(new UsersRoutes(app));
 routes.push(new CalendarRoutes(app));
 routes.push(new PaymentOverrideRoutes(app));
-routes.push(new CancellationRoutes(app));
+app.use(new CancellationRouter().configureRouter());
 routes.push(new CompanyRoutes(app));
 
 routes.forEach((route) => {

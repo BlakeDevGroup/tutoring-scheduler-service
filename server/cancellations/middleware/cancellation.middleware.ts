@@ -1,25 +1,25 @@
 import express from "express";
-import cancellationService from "../services/cancellation.service";
 import debug from "debug";
+import CancellationService from "../services/cancellation.service";
 
 const log: debug.IDebugger = debug("app:cancellation-middleware");
 
 class CancellationMiddleware {
+    private cancellationService: CancellationService =
+        new CancellationService();
     async validateCancellationExists(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
-        const cancellation = await cancellationService.readById(
-            req.params.cancellationId
+        const result = await this.cancellationService.readById(
+            req.params.cancellation_id
         );
 
-        if (cancellation) {
+        if (result.success) {
             next();
         } else {
-            res.status(404).send({
-                error: `Cancellation ${req.params.cancellationId} not found`,
-            });
+            res.status(result.statusCode).send(result);
         }
     }
 
@@ -28,9 +28,9 @@ class CancellationMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        req.body.cancellationId = req.params.cancellationId;
+        req.body.cancellation_id = req.params.cancellation_id;
         next();
     }
 }
 
-export default new CancellationMiddleware();
+export default CancellationMiddleware;

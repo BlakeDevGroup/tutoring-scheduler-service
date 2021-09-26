@@ -31,4 +31,4 @@ class CancellationService implements CRUD {
     }
 }
 
-export default new CancellationService();
+export default CancellationService;

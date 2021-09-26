@@ -1,53 +1,57 @@
 import express from "express";
-import cancellationService from "../services/cancellation.service";
+import CancellationService from "../services/cancellation.service";
 import debug from "debug";
 
 const log: debug.IDebugger = debug("app:cancellation-controller");
 
 class CancellationController {
+    private cancellationService: CancellationService =
+        new CancellationService();
     async listCancellations(req: express.Request, res: express.Response) {
-        const cancellations = await cancellationService.list(100, 0);
+        const result = await this.cancellationService.list(100, 0);
 
-        res.status(200).send(cancellations);
+        res.status(result.statusCode).send(result);
     }
 
     async getCancellationById(req: express.Request, res: express.Response) {
-        const cancellation = await cancellationService.readById(
-            req.body.cancellationId
+        const result = await this.cancellationService.readById(
+            req.body.cancellation_id
         );
 
-        res.status(200).send(cancellation);
+        res.status(result.statusCode).send(result);
     }
 
     async createCancellation(req: express.Request, res: express.Response) {
-        const cancellation = await cancellationService.create(req.body);
+        const result = await this.cancellationService.create(req.body);
 
-        res.status(200).send(cancellation);
+        res.status(result.statusCode).send(result);
     }
 
     async patch(req: express.Request, res: express.Response) {
-        log(
-            await cancellationService.patchById(
-                req.body.cancellationId,
-                req.body
-            )
+        const result = await this.cancellationService.patchById(
+            req.body.cancellation_id,
+            req.body
         );
 
-        res.status(204).send();
+        res.status(result.statusCode).send(result);
     }
 
     async put(req: express.Request, res: express.Response) {
-        log(
-            await cancellationService.putById(req.body.cancellationId, req.body)
+        const result = await this.cancellationService.putById(
+            req.body.cancellation_id,
+            req.body
         );
-        res.status(204).send();
+
+        res.status(result.statusCode).send(result);
     }
 
-    async removeEvent(req: express.Request, res: express.Response) {
-        log(await cancellationService.deleteById(req.body.cancellationId));
+    async removeCancellation(req: express.Request, res: express.Response) {
+        const result = await this.cancellationService.deleteById(
+            req.body.cancellation_id
+        );
 
-        res.status(204).send();
+        res.status(result.statusCode).send(result);
     }
 }
 
-export default new CancellationController();
+export default CancellationController;
