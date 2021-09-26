@@ -1,5 +1,7 @@
 export interface PatchCancellationDto {
     amount: number;
     reason: string;
-    event_id: number;
+    id: number;
+    source: string;
+    excluded_dates: string[];
 }

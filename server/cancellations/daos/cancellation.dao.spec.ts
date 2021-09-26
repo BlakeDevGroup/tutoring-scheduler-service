@@ -12,6 +12,9 @@ const CANCELLATION_DATA = {
     amount: 50.0,
     reason: "reason",
     event_id: 1,
+    source: "event",
+    id: 1,
+    excluded_dates: ["2021-09-13T10:30-2021-09-13T11:30"],
 };
 
 const CANCELLATION_RETURN_VALUE = { rows: [{}] };
@@ -53,7 +56,7 @@ describe("CancellationDao", () => {
     });
 
     describe("add a cancellation", () => {
-        const sql = `INSERT INTO "ts.cancellations" (amount, reason, event_id) VALUES ($1, $2, $3)`;
+        const sql = `INSERT INTO "ts.cancellations" (amount, reason, source, id, excluded_dates) VALUES ($1, $2, $3, $4, $5)`;
 
         it("should send success message and run with proper arguments", async () => {
             await cancellationDao.addCancellation(CANCELLATION_DATA);
@@ -62,7 +65,9 @@ describe("CancellationDao", () => {
             expect(queryStub).calledWith(sql, [
                 CANCELLATION_DATA.amount,
                 CANCELLATION_DATA.reason,
-                CANCELLATION_DATA.event_id,
+                CANCELLATION_DATA.source,
+                CANCELLATION_DATA.id,
+                CANCELLATION_DATA.excluded_dates,
             ]);
 
             expect(spySuccess).calledOnce;
@@ -159,7 +164,7 @@ describe("CancellationDao", () => {
 
     describe("update a cancellation", () => {
         it("should send success message and run with proper arguments", async () => {
-            const sql = `UPDATE "ts.cancellations" SET amount = $2, reason = $2, event_id = $3 WHERE cancellation_id = $1`;
+            const sql = `UPDATE "ts.cancellations" SET amount = $2, reason = $3, source = $4, id = $5, excluded_dates = $6 WHERE cancellation_id = $1`;
 
             await cancellationDao.putCancellationById(
                 CANCELLATION_ID,
@@ -171,7 +176,9 @@ describe("CancellationDao", () => {
                 CANCELLATION_ID,
                 CANCELLATION_DATA.amount,
                 CANCELLATION_DATA.reason,
-                CANCELLATION_DATA.event_id,
+                CANCELLATION_DATA.source,
+                CANCELLATION_DATA.id,
+                CANCELLATION_DATA.excluded_dates,
             ]);
 
             expect(spySuccess).calledOnce;
@@ -197,7 +204,7 @@ describe("CancellationDao", () => {
         });
 
         it("should send success message and run with proper arguments", async () => {
-            const sql = `UPDATE "ts.cancellations" SET amount = $2, reason = $2, event_id = $3 WHERE cancellation_id = $1`;
+            const sql = `UPDATE "ts.cancellations" SET amount = $2, reason = $3, source = $4, id = $5, excluded_dates = $6 WHERE cancellation_id = $1`;
 
             await cancellationDao.patchCancellationById(
                 CANCELLATION_ID,
@@ -209,7 +216,9 @@ describe("CancellationDao", () => {
                 CANCELLATION_ID,
                 CANCELLATION_DATA.amount,
                 CANCELLATION_DATA.reason,
-                CANCELLATION_DATA.event_id,
+                CANCELLATION_DATA.source,
+                CANCELLATION_DATA.id,
+                CANCELLATION_DATA.excluded_dates,
             ]);
 
             expect(spySuccess).calledOnce;
