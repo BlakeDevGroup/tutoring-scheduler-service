@@ -8,6 +8,7 @@ import SeriesRouter from "./series.router";
 let SERIES_DATA: Object;
 const CALENDAR_ID = "2";
 const SERIES_ID = "48";
+const COMPANY_ID = "128";
 let app: express.Application = express();
 app.use(express.json());
 app.use("/", new SeriesRouter().configureRouter());
@@ -23,6 +24,8 @@ describe("SeriesRoutes", () => {
             start_recur: "2021-08-31",
             end_recur: "2022-08-31",
             days_of_week: [0, 1, 2],
+            user_id: "1",
+            company_id: COMPANY_ID,
         };
     });
     afterEach(() => {
@@ -65,6 +68,40 @@ describe("SeriesRoutes", () => {
     });
 
     describe("POST /series", () => {
+        it("when user_id is not a numeric then return error with status 400", async () => {
+            const VALUE = "XXX";
+            const response = await request(app)
+                .post("/series")
+                .send(Object.assign(SERIES_DATA, { user_id: VALUE }));
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error", "statusCode");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid value for param: user_id value: ${VALUE}`
+            );
+        });
+
+        it("when company_id is not a numeric then return error with status 400", async () => {
+            const VALUE = "XXX";
+            const response = await request(app)
+                .post("/series")
+                .send(Object.assign(SERIES_DATA, { company_id: VALUE }));
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error", "statusCode");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid value for param: company_id value: ${VALUE}`
+            );
+        });
+
         it("when title is not a string then return error with status 400", async () => {
             const VALUE = 123;
             const response = await request(app)
@@ -333,6 +370,40 @@ describe("SeriesRoutes", () => {
     });
 
     describe("PUT /series/:series_id", () => {
+        it("when user_id is not a numeric then return error with status 400", async () => {
+            const VALUE = "XXX";
+            const response = await request(app)
+                .put(`/series/${SERIES_ID}`)
+                .send(Object.assign(SERIES_DATA, { user_id: VALUE }));
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error", "statusCode");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid value for param: user_id value: ${VALUE}`
+            );
+        });
+
+        it("when company_id is not a numeric then return error with status 400", async () => {
+            const VALUE = "XXX";
+            const response = await request(app)
+                .put(`/series/${SERIES_ID}`)
+                .send(Object.assign(SERIES_DATA, { company_id: VALUE }));
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error", "statusCode");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid value for param: company_id value: ${VALUE}`
+            );
+        });
+
         it("when title is not a string then return error with status 400", async () => {
             const VALUE = 123;
             const response = await request(app)
@@ -372,6 +443,39 @@ describe("SeriesRoutes", () => {
     });
 
     describe("PATCH /series/:series_id", () => {
+        it("when user_id is not a string then return error with status 400", async () => {
+            const VALUE = "XXX";
+            const response = await request(app)
+                .patch(`/series/${SERIES_ID}`)
+                .send(Object.assign(SERIES_DATA, { user_id: VALUE }));
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error", "statusCode");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid value for param: user_id value: ${VALUE}`
+            );
+        });
+
+        it("when company_id is not a string then return error with status 400", async () => {
+            const VALUE = "XXX";
+            const response = await request(app)
+                .patch(`/series/${SERIES_ID}`)
+                .send(Object.assign(SERIES_DATA, { company_id: VALUE }));
+
+            expect(response.statusCode).to.equal(400);
+            expect(response.body)
+                .to.be.an("object")
+                .and.include.keys("success", "message", "error", "statusCode");
+
+            expect(response.body.success).to.equal(false);
+            expect(response.body.message).to.equal(
+                `Invalid value for param: company_id value: ${VALUE}`
+            );
+        });
         it("when title is not a string then return error with status 400", async () => {
             const VALUE = 123;
             const response = await request(app)

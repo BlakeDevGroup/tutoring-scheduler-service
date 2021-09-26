@@ -17,6 +17,8 @@ const SERIES_DATA = {
     start_recur: "8-31-2021",
     end_recur: "8-31-2022",
     days_of_week: [0, 1, 2],
+    user_id: "1",
+    company_id: "1",
 };
 const SERIES_ID = "1";
 describe("SeriesService", () => {

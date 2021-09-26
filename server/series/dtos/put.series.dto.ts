@@ -7,4 +7,6 @@ export interface PutSeriesDto {
     start_recur: string;
     end_recur: string;
     days_of_week: number[];
+    user_id: string;
+    company_id: string;
 }
