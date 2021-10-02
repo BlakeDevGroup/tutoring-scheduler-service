@@ -7,8 +7,8 @@ import SeriesRouter from "./series.router";
 
 let SERIES_DATA: Object;
 const CALENDAR_ID = "2";
-const SERIES_ID = "48";
-const COMPANY_ID = "128";
+const SERIES_ID = "163";
+const COMPANY_ID = "143";
 let app: express.Application = express();
 app.use(express.json());
 app.use("/", new SeriesRouter().configureRouter());
@@ -309,8 +309,9 @@ describe("SeriesRoutes", () => {
             expect(response.body.message).to.equal(
                 "Successfully created series"
             );
-            expect(response.body.data).to.be.an("array");
-            expect(response.body.data.length).to.equal(0);
+            expect(response.body.data)
+                .to.be.an("object")
+                .and.include.keys("series_id");
         });
     });
 

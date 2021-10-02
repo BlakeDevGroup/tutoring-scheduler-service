@@ -19,7 +19,7 @@ export default class EventDao {
     }
 
     async addEvent(event: CreateEventDto): Promise<ServerResponsePayload> {
-        const sql = `INSERT INTO "${this.tableName}" (date_start, date_end, title, all_day, calendar_id, user_id, description, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+        const sql = `INSERT INTO "${this.tableName}" (date_start, date_end, title, all_day, calendar_id, user_id, description, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING event_id`;
         try {
             const { rows } = await query(sql, [
                 event.date_start,
@@ -32,8 +32,12 @@ export default class EventDao {
                 event.company_id,
             ]);
 
-            return sendSuccess("Event created successfully", [], 201);
-        } catch (e) {
+            return sendSuccess(
+                "Event created successfully",
+                { ...event, ...rows[0] },
+                201
+            );
+        } catch (e: any) {
             return sendFailure(e.message, e);
         }
     }

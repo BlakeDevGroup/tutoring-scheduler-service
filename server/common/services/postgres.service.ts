@@ -1,7 +1,12 @@
-import { Pool } from "pg";
-import { postgresConfig } from "../common.configs";
+import { Pool, PoolConfig } from "pg";
+import { postgresConfig, postGresConfigTesting } from "../common.configs";
 
-const pool: Pool = new Pool(postgresConfig);
+let config: PoolConfig =
+    process.env.NODE_ENV?.toUpperCase() == "TEST"
+        ? postGresConfigTesting
+        : postgresConfig;
+
+const pool = new Pool(config);
 
 const testQuery = async (text: string, params: any) => {
     const client = await pool.connect();
@@ -14,8 +19,12 @@ const testQuery = async (text: string, params: any) => {
 };
 
 export function query(text: string, params: any): any {
-    if (process.env.APP == "dev" || process.env.APP == "prod")
+    if (
+        process.env.NODE_ENV?.toUpperCase() == "DEVELOPMENT" ||
+        process.env.NODE_ENV?.toUpperCase() == "PRODUCTION"
+    )
         return pool.query(text, params);
 
-    if (process.env.APP == "test") return testQuery(text, params);
+    if (process.env.NODE_ENV?.toUpperCase() == "TEST")
+        return testQuery(text, params);
 }

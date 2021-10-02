@@ -63,8 +63,10 @@ describe("EventDao", function () {
     });
 
     describe("method:addEvent", () => {
-        const EVENT_STRING: string = `INSERT INTO "ts.events" (date_start, date_end, title, all_day, calendar_id, user_id, description, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
+        const EVENT_STRING: string = `INSERT INTO "ts.events" (date_start, date_end, title, all_day, calendar_id, user_id, description, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING event_id`;
         it("should run with correct parameters and run query only once", async () => {
+            queryStub.resolves({ rows: [{ event_id: "1" }] });
+
             await eventDao.addEvent({
                 date_end: CREATED_EVENTS_LIST.rows[0].date_end,
                 date_start: CREATED_EVENTS_LIST.rows[0].date_start,

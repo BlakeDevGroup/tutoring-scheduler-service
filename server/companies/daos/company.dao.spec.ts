@@ -120,8 +120,8 @@ describe("CompanyDao", () => {
 
     describe("add company", () => {
         it("when success then sendSuccess with status 201", async () => {
-            const sql = `INSERT INTO "ts.companies" (name, pay_rate, color) VALUES ($1, $2, $3)`;
-
+            const sql = `INSERT INTO "ts.companies" (name, pay_rate, color) VALUES ($1, $2, $3) RETURNING company_id`;
+            queryStub.resolves({ rows: [{ company_id: "1" }] });
             await companyDao.addCompany(COMPANY_DATA);
 
             expect(queryStub).calledWith(sql, [
@@ -132,11 +132,14 @@ describe("CompanyDao", () => {
             expect(queryStub).calledOnce;
 
             expect(spySuccess).calledOnce;
-            expect(spySuccess).calledWith(
-                "Successfully created company",
-                COMPANY_RESPONSE.rows[0],
-                201
+            expect(spySuccess.args[0][0]).to.equal(
+                "Successfully created company"
             );
+            expect(spySuccess.args[0][1]).to.eql({
+                ...COMPANY_DATA,
+                company_id: "1",
+            });
+            expect(spySuccess.args[0][2]).to.equal(201);
         });
 
         it("when error is thrown then sendFailure with status 500", async () => {

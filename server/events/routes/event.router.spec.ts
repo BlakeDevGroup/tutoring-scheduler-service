@@ -5,7 +5,7 @@ import express from "express";
 
 import EventRouter from "./event.router";
 const CALENDAR_ID = "2";
-const EVENT_ID = "336";
+const EVENT_ID = "480";
 // import app from "../../../app";
 type Payload = {
     date_end: string;
@@ -284,7 +284,9 @@ describe("EventRouter", () => {
                 .and.include.keys("success", "statusCode", "data", "message");
 
             expect(response.body.success).to.equal(true);
-            expect(response.body.data).to.deep.equal([]);
+            expect(response.body.data)
+                .to.be.an("object")
+                .and.include.keys("event_id");
             expect(response.body.message).to.equal(
                 "Event created successfully"
             );

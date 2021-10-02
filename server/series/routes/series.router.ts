@@ -27,7 +27,9 @@ export default class SeriesRouter extends CommonRouterConfig {
                 this.seriesMiddleware.validateDate.bind(this.seriesMiddleware)
             ),
             body("end_recur").custom(
-                this.seriesMiddleware.validateDate.bind(this.seriesMiddleware)
+                this.seriesMiddleware.validateDateEnd.bind(
+                    this.seriesMiddleware
+                )
             ),
             body("days_of_week").isArray(),
             BodyValidationMiddleware.verifyBodyFieldsErrors,
