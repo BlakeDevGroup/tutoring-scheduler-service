@@ -5,9 +5,9 @@ import express from "express";
 
 import EventCancellationRouter from "./event_cancellaton.router";
 
-const CANCELLATION_ID = "1";
-const EVENT_ID = "336";
-const POST_EVENT_ID = "351";
+const CANCELLATION_ID = "72";
+const EVENT_ID = "480";
+const POST_EVENT_ID = "485";
 
 const DATA = {
     event_id: POST_EVENT_ID,

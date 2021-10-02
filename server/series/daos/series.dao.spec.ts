@@ -57,8 +57,10 @@ describe("SeriesDao", () => {
     //should check if query is called with proper arguments
     //check if sendSucces is called with proper arguments
     describe("add a series", () => {
-        const sql = `INSERT INTO "ts.series" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week, user_id, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+        const sql = `INSERT INTO "ts.series" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week, user_id, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING series_id`;
         it("should send success message and run with proper arguments", async () => {
+            queryStub.resolves({ rows: [{ series_id: "1" }] });
+
             await seriesDao.addSeries(SERIES_DATA);
             expect(queryStub).calledOnce;
             expect(queryStub).calledWith(sql, [
@@ -75,11 +77,12 @@ describe("SeriesDao", () => {
             ]);
 
             expect(spySuccess).calledOnce;
-            expect(spySuccess).calledWith(
-                "Successfully created series",
-                [],
-                201
-            );
+            expect(spySuccess.args[0][0]).equals("Successfully created series");
+            expect(spySuccess.args[0][1]).eqls({
+                ...SERIES_DATA,
+                series_id: "1",
+            });
+            expect(spySuccess.args[0][2]).equals(201);
         });
 
         it("should send failure with status 500", async () => {

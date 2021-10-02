@@ -2,6 +2,7 @@ import express, { request } from "express";
 import SeriesService from "../services/series.service";
 import debug from "debug";
 import { sendFailure } from "../../common/services/message/message.service";
+import { TypedRule } from "tslint/lib/rules";
 
 const log: debug.IDebugger = debug("app:series-middleware");
 
@@ -59,6 +60,16 @@ class SeriesMiddleware {
 
     validateDate(date: string) {
         return RegExp(/[0-9]{4}-[0-9]{2}-[0-9]{2}/g).test(date);
+    }
+
+    /**
+     * if date evaluates as false true
+     * otherwise, validate string is dateString
+     * @param date
+     */
+    validateDateEnd(date: string | undefined | null) {
+        if (date) return this.validateDate(date);
+        else return true;
     }
 }
 

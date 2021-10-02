@@ -1,10 +1,10 @@
 import { Pool, PoolConfig } from "pg";
 
 export const postgresConfig: PoolConfig = {
-    host: "chunee.db.elephantsql.com",
-    user: "kwuhqibe",
-    password: "l6YIXpBrgcz9G5TaStPvG9NBe0HPcb01",
-    database: "kwuhqibe",
+    host: process.env.DB_HOST_DEVELOPMENT,
+    user: process.env.DB_USER_DEVELOPMENT,
+    password: process.env.DB_PASSWORD_DEVELOPMENT,
+    database: process.env.DB_DATABASE_DEVELOPMENT,
 };
 
 export const memCacheConfig = {
@@ -14,8 +14,8 @@ export const memCacheConfig = {
 };
 
 export const postGresConfigTesting: PoolConfig = {
-    host: "chunee.db.elephantsql.com",
-    user: "denqnwfv",
-    password: "ccGkavduTJaeJBmpgJ6f4CaNV94FSdS6",
-    database: "denqnwfv",
+    host: process.env.DB_HOST_TEST,
+    user: process.env.DB_USER_TEST,
+    password: process.env.DB_PASSWORD_TEST,
+    database: process.env.DB_DATABSE_TEST,
 };

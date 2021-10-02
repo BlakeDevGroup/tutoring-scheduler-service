@@ -175,4 +175,37 @@ describe("SeriesMiddleware", () => {
             expect(next).calledOnce;
         });
     });
+
+    describe("validateDateEnd", () => {
+        let spy: SinonSpy;
+
+        afterEach(() => {
+            spy.restore();
+        });
+
+        beforeEach(() => {
+            spy = sinon.spy(SeriesMiddleware.prototype, "validateDate");
+        });
+        it("when date evaluates to false then return true", () => {
+            let result = seriesMiddleware.validateDateEnd("");
+
+            expect(result).to.equal(true);
+
+            result = seriesMiddleware.validateDateEnd(null);
+
+            expect(result).to.equal(true);
+
+            result = seriesMiddleware.validateDateEnd(undefined);
+        });
+
+        it("when date end evalutes to a date then return true", () => {
+            let result = seriesMiddleware.validateDateEnd("2021-10-15");
+
+            expect(result).to.equal(true);
+
+            expect(spy).calledOnce;
+
+            expect(spy).calledWith("2021-10-15");
+        });
+    });
 });

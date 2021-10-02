@@ -22,7 +22,7 @@ class CompanyDao {
     async addCompany(
         company: CreateCompanyDto
     ): Promise<ServerResponsePayload> {
-        const sql = `INSERT INTO "${this.tableName}" (name, pay_rate, color) VALUES ($1, $2, $3)`;
+        const sql = `INSERT INTO "${this.tableName}" (name, pay_rate, color) VALUES ($1, $2, $3) RETURNING company_id`;
         try {
             const { rows } = await query(sql, [
                 company.name,
@@ -30,8 +30,12 @@ class CompanyDao {
                 company.color,
             ]);
 
-            return sendSuccess("Successfully created company", rows[0], 201);
-        } catch (e) {
+            return sendSuccess(
+                "Successfully created company",
+                { ...company, ...rows[0] },
+                201
+            );
+        } catch (e: any) {
             return sendFailure(e.message, e, 500);
         }
     }
@@ -42,7 +46,7 @@ class CompanyDao {
             const { rows } = await query(sql, []);
 
             return sendSuccess("Successfully retrieved companies", rows);
-        } catch (e) {
+        } catch (e: any) {
             return sendFailure(e.message, e, 500);
         }
     }
@@ -63,7 +67,7 @@ class CompanyDao {
                     404
                 );
             }
-        } catch (e) {
+        } catch (e: any) {
             return sendFailure(e.message, e);
         }
     }
@@ -85,7 +89,7 @@ class CompanyDao {
                 "Successfully updated company",
                 Object.assign(company, { company_id: companyId })
             );
-        } catch (e) {
+        } catch (e: any) {
             return sendFailure(e.message, e, 500);
         }
     }
@@ -107,7 +111,7 @@ class CompanyDao {
                 "Successfully updated company",
                 Object.assign(company, { company_id: companyId })
             );
-        } catch (e) {
+        } catch (e: any) {
             return sendFailure(e.message, e, 500);
         }
     }
@@ -119,7 +123,7 @@ class CompanyDao {
             await query(sql, [companyId]);
 
             return sendSuccess("Successfully removed company");
-        } catch (e) {
+        } catch (e: any) {
             return sendFailure(e.message, e, 500);
         }
     }

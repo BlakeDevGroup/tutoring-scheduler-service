@@ -20,9 +20,9 @@ export default class SeriesDao {
     }
 
     async addSeries(series: CreateSeriesDto): Promise<ServerResponsePayload> {
-        const sql = `INSERT INTO "${this.tableName}" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week, user_id, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+        const sql = `INSERT INTO "${this.tableName}" (title, description, calendar_id, start_time, end_time, start_recur, end_recur, days_of_week, user_id, company_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING series_id`;
         try {
-            await query(sql, [
+            const { rows } = await query(sql, [
                 series.title,
                 series.description,
                 series.calendar_id,
@@ -35,7 +35,11 @@ export default class SeriesDao {
                 series.company_id,
             ]);
 
-            return sendSuccess("Successfully created series", [], 201);
+            return sendSuccess(
+                "Successfully created series",
+                { ...series, ...rows[0] },
+                201
+            );
         } catch (e: any) {
             return sendFailure(e.message, e, 500);
         }
