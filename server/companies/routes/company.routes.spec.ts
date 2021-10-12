@@ -23,6 +23,7 @@ describe("CompanyRoutes", () => {
     });
 
     describe("GET /companies", () => {
+    describe.only("GET /companies", () => {
         it("should return all companies with statusCode 200", async () => {
             const response = await request(app).get("/companies");
 
