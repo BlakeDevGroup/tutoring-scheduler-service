@@ -40,9 +40,7 @@
     "debug": "export DEBUG=* && npm run start",
     "test": "set NODE_ENV=test&&nyc --reporter=html mocha",
     "test-w": "set NODE_ENV=test&&env-cmd -e test mocha --watch",
-    "heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
-    "heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;"
-
+    "postinstall": "tsc"
   },
   "devDependencies": {
     "@netflix/tslint-config": "^1.0.1",
@@ -66,5 +64,6 @@
     "sinon-chai": "^3.7.0",
     "supertest": "^6.1.6",
     "ts-node": "^10.2.1"
-  }
+  },
+  "engines": {"node": "12.18.3"}
 }
