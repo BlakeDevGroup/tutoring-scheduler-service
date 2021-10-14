@@ -1,10 +1,12 @@
 import { Pool, PoolConfig } from "pg";
 import { postgresConfig, postGresConfigTesting } from "../common.configs";
 
-let config: PoolConfig =
-    process.env.NODE_ENV?.toUpperCase() == "TEST"
-        ? postGresConfigTesting
-        : postgresConfig;
+let config: PoolConfig = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+};
 
 const pool = new Pool(config);
 
