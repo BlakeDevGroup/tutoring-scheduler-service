@@ -7,5 +7,6 @@
         "esModuleInterop": true,
         "inlineSourceMap": true,
         "noImplicitThis": false
-    }
+    },
+    "exclude": ["/server/**.*spec.ts"]
 }
