@@ -39,7 +39,10 @@
     "start-test": "set NODE_ENV=test&& tsc &&env-cmd -e test nodemon --watch ./ --ext ts --exec ts-node --ignore '*.spec.ts' --delay 1 app.ts --unhandled-rejections=strict ./dist/app.js",
     "debug": "export DEBUG=* && npm run start",
     "test": "set NODE_ENV=test&&nyc --reporter=html mocha",
-    "test-w": "set NODE_ENV=test&&env-cmd -e test mocha --watch"
+    "test-w": "set NODE_ENV=test&&env-cmd -e test mocha --watch",
+    "heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
+    "heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;"
+
   },
   "devDependencies": {
     "@netflix/tslint-config": "^1.0.1",
